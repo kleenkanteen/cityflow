@@ -3,6 +3,7 @@ import { db } from '@/db';
 import { inventoryItem } from '@/src/db/schema';
 import { desc, ilike, or } from 'drizzle-orm';
 import { CreateInventoryItemRequest } from '@/src/types/inventory';
+import { v4 as uuidv4 } from 'uuid';
 
 export async function GET(request: NextRequest) {
   try {
@@ -45,12 +46,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const now = new Date();
     const newItem = await db
       .insert(inventoryItem)
       .values({
+        id: uuidv4(),
         name,
         description: description || null,
         quantity,
+        createdAt: now,
+        updatedAt: now,
       })
       .returning();
 
