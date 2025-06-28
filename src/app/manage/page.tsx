@@ -76,7 +76,7 @@ export default function ManagePage() {
   return (
     <div className="flex w-full h-screen bg-gray-50">
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 bg-white border-b border-gray-100 z-10 shadow-sm">
+      <div className="bg-white border-b border-gray-100 z-10 shadow-sm">
         <div className="px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
