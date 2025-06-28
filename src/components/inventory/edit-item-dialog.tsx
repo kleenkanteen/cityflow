@@ -11,7 +11,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/src/components/ui/dialog';
 import {
   Form,
@@ -23,8 +22,7 @@ import {
 } from '@/src/components/ui/form';
 import { Input } from '@/src/components/ui/input';
 import { Button } from '@/src/components/ui/button';
-import { Plus } from 'lucide-react';
-import { CreateInventoryItemRequest } from '@/src/types/inventory';
+import { InventoryItem, UpdateInventoryItemRequest } from '@/src/types/inventory';
 
 const formSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
@@ -34,34 +32,46 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-interface AddItemDialogProps {
-  onItemAdded: () => void;
+interface EditItemDialogProps {
+  item: InventoryItem;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onItemUpdated: () => void;
 }
 
-export function AddItemDialog({ onItemAdded }: AddItemDialogProps) {
-  const [open, setOpen] = React.useState(false);
+export function EditItemDialog({ item, open, onOpenChange, onItemUpdated }: EditItemDialogProps) {
   const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      description: '',
-      quantity: 0,
+      name: item.name,
+      description: item.description || '',
+      quantity: item.quantity,
     },
   });
+
+  React.useEffect(() => {
+    if (item) {
+      form.reset({
+        name: item.name,
+        description: item.description || '',
+        quantity: item.quantity,
+      });
+    }
+  }, [item, form]);
 
   async function handleSubmit(data: FormData) {
     setIsLoading(true);
     try {
-      const requestData: CreateInventoryItemRequest = {
+      const requestData: Omit<UpdateInventoryItemRequest, 'id'> = {
         name: data.name,
         description: data.description || undefined,
         quantity: data.quantity,
       };
 
-      const response = await fetch('/api/inventory', {
-        method: 'POST',
+      const response = await fetch(`/api/inventory/${item.id}`, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -69,32 +79,24 @@ export function AddItemDialog({ onItemAdded }: AddItemDialogProps) {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create inventory item');
+        throw new Error('Failed to update inventory item');
       }
 
-      form.reset();
-      setOpen(false);
-      onItemAdded();
+      onItemUpdated();
     } catch (error) {
-      console.error('Error creating inventory item:', error);
+      console.error('Error updating inventory item:', error);
     } finally {
       setIsLoading(false);
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Add Item
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Inventory Item</DialogTitle>
+          <DialogTitle>Edit Inventory Item</DialogTitle>
           <DialogDescription>
-            Add a new item to your inventory. Fill in the details below.
+            Update the details of your inventory item.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -144,11 +146,11 @@ export function AddItemDialog({ onItemAdded }: AddItemDialogProps) {
               )}
             />
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? 'Adding...' : 'Add Item'}
+                {isLoading ? 'Updating...' : 'Update Item'}
               </Button>
             </DialogFooter>
           </form>
