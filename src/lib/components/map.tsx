@@ -134,7 +134,7 @@ export default function Map() {
           </div>
           <button
             onClick={() => setMarkers([])}
-            className="w-full bg-red-500 text-white px-3 py-2 rounded text-sm hover:bg-red-600 transition-colors"
+            className="w-full bg-red-500 bg- px-3 py-2 rounded text-sm hover:bg-red-600 transition-colors"
             disabled={markers.length === 0}
           >
             Clear All Markers
