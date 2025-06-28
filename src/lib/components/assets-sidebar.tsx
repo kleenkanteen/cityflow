@@ -46,7 +46,7 @@ export default function AssetsSidebar({
         {assets.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
             <div className="p-4 bg-gray-50 rounded-full mb-4">
-              <MapPin className="h-6 w-6 text-blue-600 bg-white" />
+              <MapPin className="h-6 w-6 text-blue-600 bg-white text-sm" />
             </div>
             <h3 className="text-sm font-medium text-gray-900 mb-2">No assets yet</h3>
             <p className="text-xs text-gray-500 leading-relaxed">
