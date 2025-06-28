@@ -130,7 +130,7 @@ export default function Map() {
         </p>
         <div className="space-y-2">
           <div className="text-sm">
-            <span className="font-medium">Total Markers:</span> {markers.length}
+            <span className="font-medium text-black">Total Markers:</span> {markers.length}
           </div>
           <button
             onClick={() => setMarkers([])}
