@@ -43,7 +43,7 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
       {/* Assets List */}
       <div className="flex-1 overflow-y-auto">
         {assets.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+          <div className="flex flex-col items-center justify-center py-16 px-6 mt-8 text-center">
             <div className="p-4 bg-gray-50 rounded-full mb-4">
               <MapPin className="h-6 w-6 text-gray-400" />
             </div>
