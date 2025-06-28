@@ -99,7 +99,6 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
                     variant="destructive"
                     size="sm"
                     className="group-hover:opacity-100 transition-opacity h-8 w-8 p-0 text-gray-400 hover:text-red-400 hover:bg-red-50 cursor-pointer"
-                    data-delete-trigger="true"
                     onClick={(e) => handleDeleteClick(asset, e)}
                   >
                     <Trash2 className="w-4 h-4 text-white" />
