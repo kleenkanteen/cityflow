@@ -74,9 +74,9 @@ export default function ManagePage() {
   }
 
   return (
-    <div className="flex w-full h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-100 z-10 shadow-sm">
+    <div className="flex flex-col w-full h-screen bg-gray-50">
+      {/* Header - Fixed at top */}
+      <div className="bg-white border-b border-gray-100 shadow-sm flex-shrink-0">
         <div className="px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -96,7 +96,7 @@ export default function ManagePage() {
               </div>
             </div>
             
-            {/* Optional: Add action buttons here */}
+            {/* Asset counter */}
             <div className="flex items-center space-x-3">
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">{assets.length}</p>
@@ -107,10 +107,10 @@ export default function ManagePage() {
         </div>
       </div>
 
-      {/* Main Content - with top padding for header */}
-      <div className="flex w-full h-full pt-24">
+      {/* Main Content - Sidebar and Map */}
+      <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
-        <div className="w-80 h-full">
+        <div className="w-80 flex-shrink-0">
           <AssetsSidebar
             assets={assets}
             currentAsset={currentAsset}
@@ -120,7 +120,7 @@ export default function ManagePage() {
         </div>
 
         {/* Map */}
-        <div className="flex-1 h-full">
+        <div className="flex-1">
           <ManageAssetsMap
             onInit={(map) => setMap(map)}
             onMove={(info) => setMapInfo(info)}
