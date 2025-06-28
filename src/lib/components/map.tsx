@@ -170,7 +170,7 @@ export default function Map() {
       )}
 
       {/* Map Container */}
-      <div ref={mapContainer} className="w-full h-full" />
+      <div ref={mapContainer} className="w-full h-3/4" />
     </div>
   );
 }
