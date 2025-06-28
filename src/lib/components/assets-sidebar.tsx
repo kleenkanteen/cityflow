@@ -91,7 +91,6 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
                         variant="primary"
                         size="sm"
                         className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-                        data-dropdown-trigger="true"
                       >
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
