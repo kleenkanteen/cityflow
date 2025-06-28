@@ -75,7 +75,7 @@ export default function AssetsSidebar({
                       {asset.name}
                     </h3>
                     {asset.description && (
-                      <p className="text-cs text-gray-600 mt-1 line-clamp-2">
+                      <p className="text-xs text-gray-600 mt-1 line-clamp-2">
                         {asset.description}
                       </p>
                     )}
