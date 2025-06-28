@@ -103,7 +103,6 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
                     onClick={(e) => handleDeleteClick(asset, e)}
                   >
                     <Trash2 className="w-4 h-4" />
-                    <span className="">Delete asset</span>
                   </Button>
                 </div>
 
