@@ -63,11 +63,11 @@ export default function AssetsSidebar({
             </p>
           </div>
         ) : (
-          <div className="space-y-1 mt-4">
+          <div className="space-y-1 mt-2">
             {assets.map((asset) => (
               <div
                 key={asset.id}
-                className="rounded-lg px-1 py-4 border border-gray-200 hover:border-gray-300"
+                className="rounded-lg px-2 py-4 border border-gray-200 hover:border-gray-300"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
