@@ -91,6 +91,7 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
                         variant="outline"
                         size="sm"
                         className="h-8 w-8"
+                        type="submit"
                       >
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
