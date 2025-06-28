@@ -120,7 +120,7 @@ export default function ManagePage() {
         </div>
 
         {/* Map Container */}
-        <div className="flex-1 h-full">
+        <div className="h-full">
           <ManageAssetsMap
             onInit={(map) => setMap(map)}
             onMove={(info) => setMapInfo(info)}
