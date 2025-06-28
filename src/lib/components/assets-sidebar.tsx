@@ -71,9 +71,9 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
                 />
 
                 {/* Asset Header */}
-                <div className="flex items-start justify-between mb-3 pl-2">
+                <div className="flex items-start justify-between mb-3 px-2">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 pl-2">{asset.name}</h3>
+                    <h3 className="font-semibold text-gray-900 px-2">{asset.name}</h3>
                     <p className="text-sm text-gray-600 mt-1 leading-relaxed">{asset.description}</p>
                   </div>
 
