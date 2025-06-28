@@ -53,18 +53,6 @@ export default function AssetsSidebar({
 
   return (
     <div className="bg-white border-r border-gray-200 flex flex-col h-full overflow-hidden">
-      {/* Sidebar Header */}
-      <div className="p-6 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-800">
-          Assets ({assets.length})
-        </h2>
-        {assets.length > 0 && (
-          <p className="text-sm text-gray-600 mt-1">
-            Click on an asset to view details
-          </p>
-        )}
-      </div>
-
       {/* Assets List */}
       <div className="flex-1 overflow-y-auto p-4">
         {assets.length === 0 ? (
@@ -75,7 +63,7 @@ export default function AssetsSidebar({
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-1">
             {assets.map((asset) => (
               <div
                 key={asset.id}
