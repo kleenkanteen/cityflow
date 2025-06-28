@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/src/components/ui/table';
+} from '@/components/ui/table';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,9 +16,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/src/components/ui/dropdown-menu';
-import { Button } from '@/src/components/ui/button';
-import { Input } from '@/src/components/ui/input';
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardDescription } from '@/components/ui/card';
 import { MoreHorizontal, Search, Edit, Trash2 } from 'lucide-react';
 import { InventoryItem } from '@/src/types/inventory';
 import { EditItemDialog } from './edit-item-dialog';
@@ -71,6 +73,18 @@ export function InventoryTable({ items, onItemUpdated, onItemDeleted }: Inventor
     });
   }
 
+  function getStockBadge(quantity: number) {
+    if (quantity === 0) {
+      return <Badge variant="destructive">Out of Stock</Badge>;
+    } else if (quantity <= 5) {
+      return <Badge variant="secondary">Low Stock</Badge>;
+    } else if (quantity <= 10) {
+      return <Badge variant="outline">Medium Stock</Badge>;
+    } else {
+      return <Badge variant="default">In Stock</Badge>;
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
@@ -92,6 +106,7 @@ export function InventoryTable({ items, onItemUpdated, onItemDeleted }: Inventor
               <TableHead>Name</TableHead>
               <TableHead>Description</TableHead>
               <TableHead className="text-right">Quantity</TableHead>
+              <TableHead>Stock Status</TableHead>
               <TableHead>Created</TableHead>
               <TableHead>Updated</TableHead>
               <TableHead className="w-[70px]"></TableHead>
@@ -100,8 +115,10 @@ export function InventoryTable({ items, onItemUpdated, onItemDeleted }: Inventor
           <TableBody>
             {filteredItems.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                  {searchTerm ? 'No items found matching your search.' : 'No inventory items found.'}
+                <TableCell colSpan={7} className="text-center py-8">
+                  <CardDescription>
+                    {searchTerm ? 'No items found matching your search.' : 'No inventory items found.'}
+                  </CardDescription>
                 </TableCell>
               </TableRow>
             ) : (
@@ -112,6 +129,7 @@ export function InventoryTable({ items, onItemUpdated, onItemDeleted }: Inventor
                     {item.description || '-'}
                   </TableCell>
                   <TableCell className="text-right">{item.quantity}</TableCell>
+                  <TableCell>{getStockBadge(item.quantity)}</TableCell>
                   <TableCell>{formatDate(item.createdAt)}</TableCell>
                   <TableCell>{formatDate(item.updatedAt)}</TableCell>
                   <TableCell>
