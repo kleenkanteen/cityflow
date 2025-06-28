@@ -27,13 +27,13 @@ export default function ManagePage() {
 
   return (
     <div className="flex w-full h-screen">
-      <div className="w-[20%] h-full">
+      <div className="w-[25%] h-full">
         <AssetsSidebar
           assets={assets}
           onAssetsChange={handleAssetsChange}
         />
       </div>
-      <div className="w-[80%] h-full">
+      <div className="w-[75%] h-full">
         <ManageAssetsMap
           onInit={(map) => setMap(map)}
           onMove={(info) => setMapInfo(info)}
