@@ -11,7 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/src/components/ui/dialog';
+} from '@/components/ui/dialog';
 import {
   Form,
   FormControl,
@@ -19,9 +19,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/src/components/ui/form';
-import { Input } from '@/src/components/ui/input';
-import { Button } from '@/src/components/ui/button';
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { InventoryItem, UpdateInventoryItemRequest } from '@/src/types/inventory';
 
 const formSchema = z.object({
