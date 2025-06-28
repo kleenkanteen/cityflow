@@ -144,7 +144,7 @@ export default function Map() {
 
       {/* Marker List */}
       {markers.length > 0 && (
-        <div className="absolute top-4 right-4 bg-gray-500 rounded-lg shadow-lg p-4 max-w-xs max-h-80 overflow-y-auto">
+        <div className="absolute top-4 right-4 bg-gray-500 rounded-lg shadow-lg p-4 max-w-xs max-h-80 overflow-y-auto z-20">
           <h3 className="font-semibold text-gray-800 mb-2">Markers</h3>
           <div className="space-y-2">
             {markers.map((marker) => (
