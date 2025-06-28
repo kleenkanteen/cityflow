@@ -123,9 +123,9 @@ export default function Map() {
   return (
     <div className="relative w-full h-full">
       {/* Map Controls */}
-      <div className="absolute top-4 left-4 bg-gray-500 rounded-lg shadow-lg p-4 max-w-xs">
+      <div className="absolute z-2 top-4 left-4 bg-gray-500 rounded-lg shadow-lg p-4 max-w-xs">
         <h3 className="font-semibold text-gray-800 mb-2">Map Controls</h3>
-        <p className="text-sm text-gray-600 mb-3">
+        <p className="text-sm te0xt-gray-600 mb-3">
           Click anywhere on the map to place a marker
         </p>
         <div className="space-y-2">
