@@ -1,5 +1,6 @@
 import React, { ReactElement, useEffect, useRef, useState } from "react";
 import maplibregl, { LngLat, LngLatBounds, Marker } from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import {
   Dialog,
   DialogContent,
@@ -56,6 +57,7 @@ export default function ManageAssetsMap({
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markersRef = useRef<Marker[]>([]);
+  const [mapLoaded, setMapLoaded] = useState(false);
   
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [clickLocation, setClickLocation] = useState<ClickLocation | null>(null);
@@ -68,6 +70,7 @@ export default function ManageAssetsMap({
 
   // Handle map click to open dialog
   function handleMapClick(e: any) {
+    console.log('Map clicked at:', e.lngLat);
     const { lng, lat } = e.lngLat;
     setClickLocation({ lng, lat });
     setFormData({
@@ -100,6 +103,7 @@ export default function ManageAssetsMap({
       color: '#3b82f6' // Blue color for assets
     };
     
+    console.log('Adding new asset:', newAsset);
     onAssetsChange([...assets, newAsset]);
     setIsDialogOpen(false);
     setFormData({ name: "", description: "", lng: "", lat: "" });
@@ -117,6 +121,7 @@ export default function ManageAssetsMap({
   useEffect(() => {
     if (mapRef.current || !mapContainerRef.current) return;
 
+    console.log('Initializing map...');
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
       style: STYLE,
@@ -134,6 +139,15 @@ export default function ManageAssetsMap({
       "top-right"
     );
 
+    // Wait for map to load before adding event listeners
+    map.on('load', () => {
+      console.log('Map loaded successfully');
+      setMapLoaded(true);
+      
+      // Add click event listener for creating new assets
+      map.on('click', handleMapClick);
+    });
+
     map.on("move", () =>
       onMove({
         bounds: map.getBounds(),
@@ -143,9 +157,6 @@ export default function ManageAssetsMap({
         pitch: map.getPitch(),
       })
     );
-
-    // Add click event listener for creating new assets
-    map.on('click', handleMapClick);
 
     mapRef.current = map;
     onInit(map);
@@ -159,47 +170,65 @@ export default function ManageAssetsMap({
     };
   }, []);
 
-  // Update markers when assets change
+  // Update markers when assets change - only after map is loaded
   useEffect(() => {
-    if (!mapRef.current) return;
+    if (!mapRef.current || !mapLoaded) {
+      console.log('Map not ready for markers yet');
+      return;
+    }
+
+    console.log('Updating markers for assets:', assets);
 
     // Remove all existing markers
-    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current.forEach(marker => {
+      console.log('Removing marker');
+      marker.remove();
+    });
     markersRef.current = [];
 
     // Create new markers for all assets
     const newMarkers = assets.map(asset => {
+      console.log('Creating marker for asset:', asset);
       const isSelected = currentAsset?.id === asset.id;
       const markerColor = isSelected ? '#ef4444' : asset.color; // Red if selected, otherwise asset color
 
-      const marker = new Marker({
-        color: markerColor,
-        draggable: true,
-      })
-        .setLngLat([asset.lng, asset.lat])
-        .addTo(mapRef.current!);
+      try {
+        const marker = new Marker({
+          color: markerColor,
+          draggable: true,
+        })
+          .setLngLat([asset.lng, asset.lat])
+          .addTo(mapRef.current!);
 
-      // Update asset position when dragged
-      marker.on('dragend', () => {
-        const lngLat = marker.getLngLat();
-        const updatedAssets = assets.map(a => 
-          a.id === asset.id 
-            ? { ...a, lng: lngLat.lng, lat: lngLat.lat }
-            : a
-        );
-        onAssetsChange(updatedAssets);
-      });
+        console.log('Marker created and added to map:', marker);
 
-      return marker;
-    });
+        // Update asset position when dragged
+        marker.on('dragend', () => {
+          const lngLat = marker.getLngLat();
+          console.log('Marker dragged to:', lngLat);
+          const updatedAssets = assets.map(a => 
+            a.id === asset.id 
+              ? { ...a, lng: lngLat.lng, lat: lngLat.lat }
+              : a
+          );
+          onAssetsChange(updatedAssets);
+        });
+
+        return marker;
+      } catch (error) {
+        console.error('Error creating marker:', error);
+        return null;
+      }
+    }).filter(Boolean) as Marker[];
 
     markersRef.current = newMarkers;
+    console.log('Total markers created:', newMarkers.length);
 
     // Cleanup function
     return () => {
       newMarkers.forEach(marker => marker.remove());
     };
-  }, [assets, currentAsset]);
+  }, [assets, currentAsset, mapLoaded]);
 
   return (
     <>
