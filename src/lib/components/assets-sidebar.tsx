@@ -86,7 +86,7 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
 
                   {/* Actions Menu */}
                   <DropdownMenu>
-                    <DropdownMenuTrigger>
+                    <DropdownMenuTrigger asChild>
                       Delete
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40">
