@@ -88,7 +88,7 @@ export default function ManagePage() {
                   Manage Assets
                 </h1>
                 <div className="flex items-center space-x-2 mt-1">
-                  <MapPin className="h-6 w-6 text-blue-600" />
+                  <MapPin className="h-6 w-6 text-blue-600 bg-blue-600" />
                   <p className="text-sm text-gray-600">
                     Click anywhere on the map to add new assets • Select assets to highlight them
                   </p>
