@@ -26,7 +26,7 @@ interface AssetsSidebarProps {
 
 export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onAssetDelete }: AssetsSidebarProps) {
   return (
-    <div className="bg-white border-r border-gray-100 flex flex-col h-full">
+    <div className="bg-white border-r border-gray-100 flex flex-col h-full space-y-4">
       {/* Sidebar Header */}
       <div className="px-6 py-5 border-b border-gray-50 pb-8">
         <div className="flex items-center space-x-3">
