@@ -2,7 +2,14 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Trash2, MapPin, Package } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Trash2, MapPin, Package, MoreHorizontal } from "lucide-react";
 
 interface Asset {
   id: string;
@@ -54,59 +61,66 @@ export default function AssetsSidebar({
             </p>
           </div>
         ) : (
-          <div className="p-4 space-y-3">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {assets.map((asset) => (
               <div
                 key={asset.id}
-                className={`group relative bg-white rounded-lg border cursor-pointer transition-all duration-200 hover:shadow-sm ${
+                className={`group relative bg-white border border-gray-100 rounded-xl p-4 hover:border-gray-200 hover:shadow-sm transition-all duration-200 cursor-pointer ${
                   currentAsset?.id === asset.id
                     ? "border-blue-200 bg-blue-50/30"
-                    : "border-gray-100 hover:border-gray-200"
+                    : ""
                 }`}
                 onClick={() => onAssetSelect(asset)}
               >
-                <div className="p-4">
-                  {/* Header with title and category */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 text-base leading-tight">
-                        {asset.name}
-                      </h3>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2 ml-3">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-                        asset
-                      </span>
+                {/* Asset Header */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-gray-900 truncate">{asset.name}</h3>
+                    <p className="text-sm text-gray-500 mt-1">{asset.description}</p>
+                  </div>
+
+                  {/* Actions Menu */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
                       <Button
+                        variant="ghost"
+                        size="sm"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 text-gray-400 hover:text-gray-600"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <MoreHorizontal className="w-4 h-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                      <DropdownMenuItem 
+                        className="text-red-600 focus:text-red-600"
                         onClick={(e) => {
                           e.stopPropagation();
                           onAssetDelete(asset.id);
                         }}
-                        variant="ghost"
-                        size="sm"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-gray-400 hover:text-red-500 hover:bg-red-50 h-7 w-7 p-0 flex-shrink-0"
                       >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  {/* Description */}
-                  {asset.description && (
-                    <p className="text-sm text-gray-600 mb-3 leading-relaxed">
-                      {asset.description}
-                    </p>
-                  )}
-                  
-                  {/* Location coordinates */}
-                  <div className="flex items-center text-sm text-gray-500">
-                    <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
-                    <span className="font-mono">
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                {/* Location Info */}
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="flex items-center gap-1.5 text-gray-600">
+                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <span className="font-mono text-xs">
                       {asset.lat.toFixed(4)}, {asset.lng.toFixed(4)}
                     </span>
                   </div>
+                  <Badge variant="secondary" className="ml-auto text-xs bg-gray-50 text-gray-600 hover:bg-gray-100">
+                    asset
+                  </Badge>
                 </div>
+
+                {/* Subtle hover indicator */}
+                <div className="absolute inset-0 rounded-xl ring-1 ring-transparent group-hover:ring-blue-100 transition-all duration-200 pointer-events-none" />
               </div>
             ))}
           </div>
