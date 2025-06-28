@@ -22,6 +22,22 @@ interface AssetsSidebarProps {
 }
 
 export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onAssetDelete }: AssetsSidebarProps) {
+  function handleAssetClick(asset: Asset, e: React.MouseEvent) {
+    // Only select asset if not clicking on dropdown trigger
+    const target = e.target as HTMLElement;
+    const isDropdownTrigger = target.closest('[data-dropdown-trigger]');
+    
+    if (!isDropdownTrigger) {
+      onAssetSelect(asset);
+    }
+  }
+
+  function handleDeleteClick(assetId: string, e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    onAssetDelete(assetId);
+  }
+
   return (
     <div className="bg-white border-r border-gray-100 flex flex-col h-full">
       {/* Sidebar Header */}
@@ -54,12 +70,12 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
             {assets.map((asset) => (
               <div
                 key={asset.id}
-                className={`group relative bg-white border rounded-xl px-4 py-4 hover:border-gray-200 hover:shadow-sm transition-all duration-200 cursor-pointer ${
+                className={`group relative bg-white border rounded-xl px-6 py-5 hover:border-gray-200 hover:shadow-sm transition-all duration-200 cursor-pointer ${
                   currentAsset?.id === asset.id
                     ? "border-blue-300 bg-blue-50 shadow-sm"
                     : "border-gray-100"
                 }`}
-                onClick={() => onAssetSelect(asset)}
+                onClick={(e) => handleAssetClick(asset, e)}
               >
                 {/* Asset Header */}
                 <div className="flex items-start justify-between mb-4">
@@ -74,19 +90,17 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 text-gray-400 hover:text-gray-600"
-                        onClick={(e) => e.stopPropagation()}
+                        className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                        data-dropdown-trigger="true"
                       >
-                        <MoreHorizontal className="w-4 h-4 cursor-pointer" />
+                        <MoreHorizontal className="w-4 h-4" />
+                        <span className="sr-only">Open menu</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40">
                       <DropdownMenuItem
-                        className="text-red-600 focus:text-red-600"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onAssetDelete(asset.id)
-                        }}
+                        className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
+                        onClick={(e) => handleDeleteClick(asset.id, e)}
                       >
                         <Trash2 className="w-4 h-4 mr-2" />
                         Delete
