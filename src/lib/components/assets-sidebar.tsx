@@ -79,7 +79,7 @@ export default function AssetsSidebar({
                         {asset.description}
                       </p>
                     )}
-                    <div className="flex items-center mt-2 text-xs text-gray-500">
+                    <div className="flex items-center mt-4 text-xs text-gray-500">
                       <MapPin className="h-3 w-3 mr-1" />
                       <span>
                         {asset.lat.toFixed(4)}, {asset.lng.toFixed(4)}
