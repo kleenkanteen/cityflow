@@ -121,9 +121,9 @@ export default function Map() {
   }, [markers]);
 
   return (
-    <div className="relative w-full h-full">
+    <div className="w-full h-full">
       {/* Map Controls */}
-      <div className="absolute z-30 top-4 left-4 bg-gray-500 rounded-lg shadow-lg p-4 max-w-xs">
+      <div className="bg-gray-500 rounded-lg shadow-lg p-4 max-w-xs">
         <h3 className="font-semibold text-gray-800 mb-2">Map Controls</h3>
         <p className="text-sm text-gray-600 mb-3">
           Click anywhere on the map to place a marker
@@ -144,7 +144,7 @@ export default function Map() {
 
       {/* Marker List */}
       {markers.length > 0 && (
-        <div className=" top-4 right-4 bg-gray-500 rounded-lg shadow-lg p-4 max-w-xs max-h-80 overflow-y-auto z-20">
+        <div className="bg-gray-500 rounded-lg shadow-lg p-4 max-w-xs max-h-80 overflow-y-auto z-20">
           <h3 className="font-semibold text-gray-800 mb-2">Markers</h3>
           <div className="space-y-2">
             {markers.map((marker) => (
