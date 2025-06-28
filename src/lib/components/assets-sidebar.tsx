@@ -90,8 +90,8 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
                 {/* Asset Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="">
-                    <h3 className="font-medium text-gray-900 truncate mb-2">{asset.name}</h3>
-                    <p className="text-sm text-gray-500 leading-relaxed">{asset.description}</p>
+                    <h3 className="font-medium text-gray-900 mb-2">{asset.name}</h3>
+                    <p className="text-sm text-gray-500 ">{asset.description}</p>
                   </div>
 
                   {/* Delete Button */}
