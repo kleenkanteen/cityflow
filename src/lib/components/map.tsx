@@ -81,7 +81,7 @@ export default function Map() {
           <p style="margin: 0 0 8px 0; font-size: 12px;">${markerData.description || ''}</p>
           <button 
             onclick="window.removeMarker('${markerData.id}')" 
-            style="background: #ef4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;"
+            style="background: #ef4444; color: black; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px;"
           >
             Remove
           </button>
