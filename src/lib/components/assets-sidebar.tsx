@@ -77,7 +77,7 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
                         className="cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 text-gray-400 hover:text-gray-600"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <MoreHorizontal className="w-4 h-4" />
+                        <MoreHorizontal className="w-4 h-4 cursor-pointer" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40">
