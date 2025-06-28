@@ -94,7 +94,7 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
                         data-dropdown-trigger="true"
                       >
                         <MoreHorizontal className="w-4 h-4" />
-                        <span className="sr-only">Open menu</span>
+                        <span className="sr-only text-black">Open menu</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40">
