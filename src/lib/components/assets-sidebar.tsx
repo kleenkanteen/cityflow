@@ -54,7 +54,7 @@ export default function AssetsSidebar({
   return (
     <div className="bg-white border-r border-gray-200 flex flex-col h-full overflow-hidden">
       {/* Assets List */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto px-4 py-4">
         {assets.length === 0 ? (
           <div className="text-center py-12">
             <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
@@ -63,7 +63,7 @@ export default function AssetsSidebar({
             </p>
           </div>
         ) : (
-          <div className="space-y-2 mt-8">
+          <div className="space-y-1 mt-8">
             {assets.map((asset) => (
               <div
                 key={asset.id}
