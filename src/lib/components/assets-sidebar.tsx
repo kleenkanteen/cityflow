@@ -63,7 +63,7 @@ export default function AssetsSidebar({
             </p>
           </div>
         ) : (
-          <div className="space-y-2 mt-8">
+          <div className="space-y-2 mt-2">
             {assets.map((asset) => (
               <div
                 key={asset.id}
