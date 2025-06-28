@@ -108,9 +108,9 @@ export default function ManagePage() {
       </div>
 
       {/* Main Content - Sidebar and Map */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
-        <div className="w-80 flex-shrink-0">
+        <div className="w-80 flex-shrink-0 h-full">
           <AssetsSidebar
             assets={assets}
             currentAsset={currentAsset}
@@ -119,8 +119,8 @@ export default function ManagePage() {
           />
         </div>
 
-        {/* Map */}
-        <div className="flex-1">
+        {/* Map Container */}
+        <div className="flex-1 h-full">
           <ManageAssetsMap
             onInit={(map) => setMap(map)}
             onMove={(info) => setMapInfo(info)}

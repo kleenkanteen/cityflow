@@ -54,7 +54,7 @@ export default function ManageAssetsMap({
   onAssetsChange,
   currentAsset,
 }: MapProps) {
-  const mapContainerRef = useRef<any>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markersRef = useRef<Marker[]>([]);
   const [mapLoaded, setMapLoaded] = useState(false);
@@ -122,6 +122,12 @@ export default function ManageAssetsMap({
     if (mapRef.current || !mapContainerRef.current) return;
 
     console.log('Initializing map...');
+    console.log('Map container:', mapContainerRef.current);
+    console.log('Container dimensions:', {
+      width: mapContainerRef.current.offsetWidth,
+      height: mapContainerRef.current.offsetHeight
+    });
+
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
       style: STYLE,
@@ -146,6 +152,10 @@ export default function ManageAssetsMap({
       
       // Add click event listener for creating new assets
       map.on('click', handleMapClick);
+    });
+
+    map.on('error', (e) => {
+      console.error('Map error:', e);
     });
 
     map.on("move", () =>
@@ -232,8 +242,13 @@ export default function ManageAssetsMap({
 
   return (
     <>
-      <div className="flex flex-col w-full h-full" ref={mapContainerRef}>
-        <div className="">{children}</div>
+      {/* Map Container - Full height and width */}
+      <div 
+        ref={mapContainerRef} 
+        className="w-full h-full"
+        style={{ minHeight: '400px' }}
+      >
+        {children}
       </div>
 
       {/* Add Asset Dialog */}
