@@ -81,7 +81,7 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
       {/* Assets List */}
       <div className="flex-1 overflow-y-auto">
         {assets.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+          <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
             <div className="p-4 bg-gray-50 rounded-full mb-4">
               <MapPin className="h-6 w-6 text-gray-400" />
             </div>
@@ -95,7 +95,7 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
             {assets.map((asset) => (
               <div
                 key={asset.id}
-                className={`group relative bg-white border rounded-xl px-5 py-4 hover:border-gray-200 hover:shadow-sm transition-all duration-200 cursor-pointer ${
+                className={`group relative bg-white border rounded-xl px-2 py-6 hover:border-gray-200 hover:shadow-sm transition-all duration-200 cursor-pointer ${
                   currentAsset?.id === asset.id
                     ? "border-blue-300 bg-blue-50 shadow-sm"
                     : "border-gray-100"
