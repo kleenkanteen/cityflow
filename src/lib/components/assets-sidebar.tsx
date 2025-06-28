@@ -2,8 +2,16 @@
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogFooter,
+  DialogTrigger 
+} from "@/components/ui/dialog"
 import { Trash2, MapPin, Package, MoreHorizontal } from "lucide-react"
+import { useState } from "react"
 
 interface Asset {
   id: string
@@ -22,20 +30,37 @@ interface AssetsSidebarProps {
 }
 
 export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onAssetDelete }: AssetsSidebarProps) {
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null)
+
   function handleAssetClick(asset: Asset, e: React.MouseEvent) {
-    // Only select asset if not clicking on dropdown trigger
+    // Only select asset if not clicking on delete button
     const target = e.target as HTMLElement;
-    const isDropdownTrigger = target.closest('[data-dropdown-trigger]');
+    const isDeleteButton = target.closest('[data-delete-trigger]');
     
-    if (!isDropdownTrigger) {
+    if (!isDeleteButton) {
       onAssetSelect(asset);
     }
   }
 
-  function handleDeleteClick(assetId: string, e: React.MouseEvent) {
+  function handleDeleteClick(asset: Asset, e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    onAssetDelete(assetId);
+    setAssetToDelete(asset);
+    setDeleteDialogOpen(true);
+  }
+
+  function handleConfirmDelete() {
+    if (assetToDelete) {
+      onAssetDelete(assetToDelete.id);
+      setAssetToDelete(null);
+    }
+    setDeleteDialogOpen(false);
+  }
+
+  function handleCancelDelete() {
+    setAssetToDelete(null);
+    setDeleteDialogOpen(false);
   }
 
   return (
@@ -70,7 +95,7 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
             {assets.map((asset) => (
               <div
                 key={asset.id}
-                className={`group relative bg-white border rounded-xl px-4 py-2 hover:border-gray-200 hover:shadow-sm transition-all duration-200 ${
+                className={`group relative bg-white border rounded-xl px-5 py-4 hover:border-gray-200 hover:shadow-sm transition-all duration-200 cursor-pointer ${
                   currentAsset?.id === asset.id
                     ? "border-blue-300 bg-blue-50 shadow-sm"
                     : "border-gray-100"
@@ -84,20 +109,17 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
                     <p className="text-sm text-gray-500 leading-relaxed">{asset.description}</p>
                   </div>
 
-                  {/* Actions Menu */}
-                  <DropdownMenu>
-                    <DropdownMenuTrigger>
-                      Delete
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40">
-                      <DropdownMenuItem
-                        className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
-                        onClick={(e) => handleDeleteClick(asset.id, e)}
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  {/* Delete Button */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                    data-delete-trigger="true"
+                    onClick={(e) => handleDeleteClick(asset, e)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span className="sr-only">Delete asset</span>
+                  </Button>
                 </div>
 
                 {/* Location Info */}
@@ -127,6 +149,37 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
           <p className="text-xs text-gray-500 text-center">Click an asset to highlight it on the map</p>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Asset</DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <p className="text-sm text-gray-600 mb-3">
+              Are you sure you want to delete <strong>"{assetToDelete?.name}"</strong>?
+            </p>
+            <p className="text-sm text-gray-500">
+              This action cannot be undone and will permanently remove this asset from your map.
+            </p>
+          </div>
+
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={handleCancelDelete}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive"
+              onClick={handleConfirmDelete}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete Asset
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
