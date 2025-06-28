@@ -14,6 +14,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Settings, MapPin } from "lucide-react";
 
 interface Asset {
   id: string;
@@ -73,17 +74,41 @@ export default function ManagePage() {
   }
 
   return (
-    <div className="flex w-full h-screen">
+    <div className="flex w-full h-screen bg-gray-50">
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
-        <h1 className="text-2xl font-bold text-gray-900">Manage Assets</h1>
-        <p className="text-sm text-gray-600 mt-1">
-          Click anywhere on the map to add new assets. Select assets from the sidebar to highlight them.
-        </p>
+      <div className="absolute top-0 left-0 right-0 bg-white border-b border-gray-100 z-10 shadow-sm">
+        <div className="px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="p-2.5 bg-blue-100 rounded-xl">
+                <Settings className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                  Manage Assets
+                </h1>
+                <div className="flex items-center space-x-2 mt-1">
+                  <MapPin className="h-4 w-4 text-gray-400" />
+                  <p className="text-sm text-gray-600">
+                    Click anywhere on the map to add new assets • Select assets to highlight them
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Optional: Add action buttons here */}
+            <div className="flex items-center space-x-3">
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-900">{assets.length}</p>
+                <p className="text-xs text-gray-500">Total Assets</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Main Content - with top padding for header */}
-      <div className="flex w-full h-full pt-20">
+      <div className="flex w-full h-full pt-24">
         {/* Sidebar */}
         <div className="w-80 h-full">
           <AssetsSidebar
