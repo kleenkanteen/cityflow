@@ -95,11 +95,7 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
             {assets.map((asset) => (
               <div
                 key={asset.id}
-                className={`bg-white border rounded-xl px-4 py-4 hover:border-gray-200 hover:shadow-sm transition-all duration-200 ${
-                  currentAsset?.id === asset.id
-                    ? "border-blue-300 bg-blue-50 shadow-sm"
-                    : "border-gray-100"
-                }`}
+                className={`group relative bg-white border rounded-xl px-4 py-4 transition-all duration-200`}
                 onClick={(e) => handleAssetClick(asset, e)}
               >
                 {/* Asset Header */}
