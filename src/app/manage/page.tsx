@@ -48,7 +48,6 @@ export default function ManagePage() {
 
   function handleAssetDelete(assetId: string) {
     setAssetToDelete(assetId);
-    console.log("deleteing asset of id: ", assetId)
     setIsDeleteDialogOpen(true);
   }
 
