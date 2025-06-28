@@ -98,7 +98,7 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
                   <Button
                     variant="destructive"
                     size="sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 text-gray-400 hover:text-red-400 hover:bg-red-50"
                     data-delete-trigger="true"
                     onClick={(e) => handleDeleteClick(asset, e)}
                   >
