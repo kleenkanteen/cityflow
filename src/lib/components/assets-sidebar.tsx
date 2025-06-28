@@ -91,12 +91,12 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
                 <div className="flex items-start justify-between mb-4">
                   <div className="">
                     <h3 className="font-medium text-gray-900 mb-2">{asset.name}</h3>
-                    <p className="text-sm text-gray-500 ">{asset.description}</p>
+                    <p className="text-sm text-gray-500 leading-relaxed">{asset.description}</p>
                   </div>
 
                   {/* Delete Button */}
                   <Button
-                    variant="ghost"
+                    variant="destructive"
                     size="sm"
                     className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
                     data-delete-trigger="true"
