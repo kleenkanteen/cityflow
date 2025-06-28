@@ -89,12 +89,11 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
                     <DropdownMenuTrigger>
                       Delete
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-40">
+                    <DropdownMenuContent align="end" className="w-40">
                       <DropdownMenuItem
                         className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
                         onClick={(e) => handleDeleteClick(asset.id, e)}
                       >
-                        <Trash2 className="w-4 h-4 mr-2" />
                         Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
