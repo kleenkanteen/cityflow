@@ -54,7 +54,7 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
             {assets.map((asset) => (
               <div
                 key={asset.id}
-                className={`group relative bg-white border rounded-xl p-5 hover:border-gray-200 hover:shadow-sm transition-all duration-200 cursor-pointer ${
+                className={`group relative bg-white border rounded-xl p-6 hover:border-gray-200 hover:shadow-sm transition-all duration-200 cursor-pointer ${
                   currentAsset?.id === asset.id
                     ? "border-blue-300 bg-blue-50 shadow-sm"
                     : "border-gray-100"
