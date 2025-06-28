@@ -189,7 +189,7 @@ export default function ManageAssetsMap({
 
   return (
     <div className="flex-1 relative">
-      <div ref={mapContainer} className="absolute inset-0" />
+      <div ref={mapContainer} className="absolute bottom-0 inset-0" />
 
       {/* Add Asset Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
