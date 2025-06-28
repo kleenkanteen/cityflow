@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { X, MapPin, Trash2 } from "lucide-react";
 
 interface Asset {
   id: string;
@@ -29,12 +30,14 @@ interface ClickLocation {
   lat: number;
 }
 
-export default function Map() {
+export default function ManageAssets() {
   const mapContainer = useRef<any>(null);
   const map = useRef<MapLibreMap | null>(null);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [markerInstances, setMarkerInstances] = useState<Marker[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [assetToDelete, setAssetToDelete] = useState<string | null>(null);
   const [clickLocation, setClickLocation] = useState<ClickLocation | null>(null);
   const [formData, setFormData] = useState({
     name: "",
@@ -94,9 +97,30 @@ export default function Map() {
     setClickLocation(null);
   }
 
-  // Remove an asset
+  // Handle delete confirmation
+  function handleDeleteClick(assetId: string) {
+    setAssetToDelete(assetId);
+    setIsDeleteDialogOpen(true);
+  }
+
+  // Confirm deletion
+  function handleConfirmDelete() {
+    if (assetToDelete) {
+      setAssets(prev => prev.filter(asset => asset.id !== assetToDelete));
+      setAssetToDelete(null);
+    }
+    setIsDeleteDialogOpen(false);
+  }
+
+  // Cancel deletion
+  function handleCancelDelete() {
+    setAssetToDelete(null);
+    setIsDeleteDialogOpen(false);
+  }
+
+  // Remove an asset (for popup buttons)
   function removeAsset(assetId: string) {
-    setAssets(prev => prev.filter(asset => asset.id !== assetId));
+    handleDeleteClick(assetId);
   }
 
   // Initialize map
@@ -176,63 +200,96 @@ export default function Map() {
   }, [assets]);
 
   return (
-    <div className="relative w-full h-full">
-      {/* Map Controls */}
-      <div className="absolute top-4 left-4 z-20 bg-white rounded-lg shadow-lg p-4 max-w-xs">
-        <h3 className="font-semibold text-gray-800 mb-2">Asset Management</h3>
-        <p className="text-sm text-gray-600 mb-3">
-          Click anywhere on the map to add a new asset
-        </p>
-        <div className="space-y-2">
-          <div className="text-sm">
-            <span className="font-medium text-gray-700">Total Assets:</span> {assets.length}
+    <div className="flex h-screen bg-gray-50">
+      {/* Left Sidebar */}
+      <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
+        {/* Header */}
+        <div className="p-6 border-b border-gray-200">
+          <h1 className="text-2xl font-bold text-gray-900">Manage Assets</h1>
+          <p className="text-sm text-gray-600 mt-1">
+            Click on the map to add new assets
+          </p>
+        </div>
+
+        {/* Assets List */}
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">
+              Assets ({assets.length})
+            </h2>
+            {assets.length > 0 && (
+              <Button
+                onClick={() => setAssets([])}
+                variant="outline"
+                size="sm"
+                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+              >
+                Clear All
+              </Button>
+            )}
           </div>
-          <Button
-            onClick={() => setAssets([])}
-            variant="destructive"
-            size="sm"
-            className="w-full"
-            disabled={assets.length === 0}
-          >
-            Clear All Assets
-          </Button>
+
+          {assets.length === 0 ? (
+            <div className="text-center py-12">
+              <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500 text-sm">
+                No assets yet. Click on the map to add your first asset.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {assets.map((asset) => (
+                <div
+                  key={asset.id}
+                  className="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-gray-300 transition-colors"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium text-gray-900 truncate">
+                        {asset.name}
+                      </h3>
+                      {asset.description && (
+                        <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                          {asset.description}
+                        </p>
+                      )}
+                      <div className="flex items-center mt-2 text-xs text-gray-500">
+                        <MapPin className="h-3 w-3 mr-1" />
+                        <span>
+                          {asset.lat.toFixed(4)}, {asset.lng.toFixed(4)}
+                        </span>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => handleDeleteClick(asset.id)}
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0 ml-2 flex-shrink-0"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Asset List */}
-      {assets.length > 0 && (
-        <div className="absolute top-4 right-4 z-20 bg-white rounded-lg shadow-lg p-4 max-w-xs max-h-80 overflow-y-auto">
-          <h3 className="font-semibold text-gray-800 mb-2">Assets</h3>
-          <div className="space-y-2">
-            {assets.map((asset) => (
-              <div key={asset.id} className="border border-gray-200 rounded p-3">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h4 className="font-medium text-sm text-gray-900">{asset.name}</h4>
-                    {asset.description && (
-                      <p className="text-xs text-gray-600 mt-1">{asset.description}</p>
-                    )}
-                    <p className="text-xs text-gray-500 mt-1">
-                      {asset.lat.toFixed(4)}, {asset.lng.toFixed(4)}
-                    </p>
-                  </div>
-                  <Button
-                    onClick={() => removeAsset(asset.id)}
-                    variant="ghost"
-                    size="sm"
-                    className="text-red-500 hover:text-red-700 h-6 w-6 p-0 ml-2"
-                  >
-                    ✕
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Map Container */}
-      <div ref={mapContainer} className="absolute w-full h-full z-10" />
+      <div className="flex-1 relative">
+        <div ref={mapContainer} className="absolute inset-0" />
+        
+        {/* Map Instructions Overlay */}
+        <div className="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-xs z-20">
+          <h3 className="font-semibold text-gray-800 mb-2">Instructions</h3>
+          <ul className="text-sm text-gray-600 space-y-1">
+            <li>• Click anywhere to add an asset</li>
+            <li>• Drag markers to reposition</li>
+            <li>• Click markers for details</li>
+          </ul>
+        </div>
+      </div>
 
       {/* Add Asset Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -243,7 +300,7 @@ export default function Map() {
           
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Asset Name</Label>
+              <Label htmlFor="name">Asset Name *</Label>
               <Input
                 id="name"
                 placeholder="Enter asset name"
@@ -299,6 +356,33 @@ export default function Map() {
               disabled={!formData.name.trim()}
             >
               Add Asset
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Asset</DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <p className="text-sm text-gray-600">
+              Are you sure you want to delete this asset? This action cannot be undone.
+            </p>
+          </div>
+
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={handleCancelDelete}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive"
+              onClick={handleConfirmDelete}
+            >
+              Delete
             </Button>
           </DialogFooter>
         </DialogContent>
