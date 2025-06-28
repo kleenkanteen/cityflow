@@ -1,44 +1,44 @@
 "use client";
 
 import React from 'react';
-import { Package, RefreshCw, FileText } from 'lucide-react';
+import { FileText, RefreshCw, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AddItemDialog } from '@/src/components/inventory/add-item-dialog';
-import { InventoryTable } from '@/src/components/inventory/inventory-table';
-import { InventoryItem } from '@/src/types/inventory';
+import { RequestsTable } from '@/src/components/requests/requests-table';
+import { EquipmentRequest } from '@/src/types/request';
 import Link from 'next/link';
 
-export default function InventoryPage() {
-  const [items, setItems] = React.useState<InventoryItem[]>([]);
+export default function RequestsPage() {
+  const [requests, setRequests] = React.useState<EquipmentRequest[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
-  async function fetchItems() {
+  async function fetchRequests() {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/inventory');
+      const response = await fetch('/api/requests');
       if (!response.ok) {
-        throw new Error('Failed to fetch inventory items');
+        throw new Error('Failed to fetch equipment requests');
       }
       const data = await response.json();
-      setItems(data);
+      setRequests(data);
     } catch (error) {
-      console.error('Error fetching inventory items:', error);
+      console.error('Error fetching equipment requests:', error);
     } finally {
       setIsLoading(false);
     }
   }
 
   React.useEffect(() => {
-    fetchItems();
+    fetchRequests();
   }, []);
 
   function handleRefresh() {
-    fetchItems();
+    fetchRequests();
   }
 
-  const lowStockCount = items.filter(item => item.quantity <= 5).length;
-  const totalQuantity = items.reduce((sum, item) => sum + item.quantity, 0);
+  const pendingCount = requests.filter(req => req.status === 'pending').length;
+  const approvedCount = requests.filter(req => req.status === 'approved').length;
+  const deniedCount = requests.filter(req => req.status === 'denied').length;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -48,28 +48,25 @@ export default function InventoryPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
+                <Link href="/inventory">
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to Inventory
+                  </Button>
+                </Link>
                 <div className="bg-blue-100 p-3 rounded-lg">
-                  <Package className="h-8 w-8 text-blue-600" />
+                  <FileText className="h-8 w-8 text-blue-600" />
                 </div>
                 <div>
                   <CardTitle className="text-3xl font-bold text-gray-900">
-                    Inventory Management
+                    Equipment Requests
                   </CardTitle>
                   <CardDescription className="text-gray-600 mt-1">
-                    Track and manage your inventory items
+                    Review and manage equipment requests from staff
                   </CardDescription>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
-                <Link href="/requests">
-                  <Button
-                    variant="outline"
-                    className="flex items-center gap-2"
-                  >
-                    <FileText className="h-4 w-4" />
-                    See Requests
-                  </Button>
-                </Link>
                 <Button
                   variant="outline"
                   onClick={handleRefresh}
@@ -79,27 +76,26 @@ export default function InventoryPage() {
                   <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
                   Refresh
                 </Button>
-                <AddItemDialog onItemAdded={fetchItems} />
               </div>
             </div>
           </CardHeader>
         </Card>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <CardDescription className="text-sm font-medium text-gray-600">
-                    Total Unique Items
+                    Total Requests
                   </CardDescription>
                   <CardTitle className="text-2xl font-bold text-gray-900">
-                    {items.length}
+                    {requests.length}
                   </CardTitle>
                 </div>
                 <div className="bg-blue-100 p-3 rounded-lg">
-                  <Package className="h-6 w-6 text-blue-600" />
+                  <FileText className="h-6 w-6 text-blue-600" />
                 </div>
               </div>
             </CardContent>
@@ -110,14 +106,32 @@ export default function InventoryPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardDescription className="text-sm font-medium text-gray-600">
-                    Total Quantity
+                    Pending
                   </CardDescription>
-                  <CardTitle className="text-2xl font-bold text-gray-900">
-                    {totalQuantity}
+                  <CardTitle className="text-2xl font-bold text-orange-600">
+                    {pendingCount}
+                  </CardTitle>
+                </div>
+                <div className="bg-orange-100 p-3 rounded-lg">
+                  <FileText className="h-6 w-6 text-orange-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardDescription className="text-sm font-medium text-gray-600">
+                    Approved
+                  </CardDescription>
+                  <CardTitle className="text-2xl font-bold text-green-600">
+                    {approvedCount}
                   </CardTitle>
                 </div>
                 <div className="bg-green-100 p-3 rounded-lg">
-                  <Package className="h-6 w-6 text-green-600" />
+                  <FileText className="h-6 w-6 text-green-600" />
                 </div>
               </div>
             </CardContent>
@@ -128,28 +142,25 @@ export default function InventoryPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardDescription className="text-sm font-medium text-gray-600">
-                    Low Stock Items
+                    Denied
                   </CardDescription>
-                  <div className="flex items-center gap-2">
-                    <CardTitle className="text-2xl font-bold text-gray-900">
-                      {lowStockCount}
-                    </CardTitle>
-                    {lowStockCount > 0}
-                  </div>
+                  <CardTitle className="text-2xl font-bold text-red-600">
+                    {deniedCount}
+                  </CardTitle>
                 </div>
-                <div className="bg-orange-100 p-3 rounded-lg">
-                  <Package className="h-6 w-6 text-orange-600" />
+                <div className="bg-red-100 p-3 rounded-lg">
+                  <FileText className="h-6 w-6 text-red-600" />
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Inventory Table */}
+        {/* Requests Table */}
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-gray-900">
-              Inventory Items
+              All Requests
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -157,14 +168,13 @@ export default function InventoryPage() {
               <div className="flex items-center justify-center py-12">
                 <RefreshCw className="h-8 w-8 animate-spin text-gray-400" />
                 <CardDescription className="ml-2 text-gray-600">
-                  Loading inventory...
+                  Loading requests...
                 </CardDescription>
               </div>
             ) : (
-              <InventoryTable
-                items={items}
-                onItemUpdated={fetchItems}
-                onItemDeleted={fetchItems}
+              <RequestsTable
+                requests={requests}
+                onRequestUpdated={fetchRequests}
               />
             )}
           </CardContent>
