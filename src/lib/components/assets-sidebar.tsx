@@ -29,7 +29,7 @@ export default function AssetsSidebar({
   return (
     <div className="bg-white border-r border-gray-100 flex flex-col h-full shadow-sm">
       {/* Sidebar Header */}
-      <div className="px-6 py-5 border-t border-gray-50 bg-gray-50/50">
+      <div className="px-6 py-5">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-blue-100 rounded-lg">
             <Package className="h-5 w-5 text-blue-600" />
