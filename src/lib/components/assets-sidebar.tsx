@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Trash2, MapPin, Package, MoreHorizontal } from "lucide-react"
 
 interface Asset {
@@ -86,16 +86,18 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
 
                   {/* Actions Menu */}
                   <DropdownMenu>
-  <DropdownMenuTrigger>Open</DropdownMenuTrigger>
-  <DropdownMenuContent>
-    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-    <DropdownMenuSeparator />
-    <DropdownMenuItem>Profile</DropdownMenuItem>
-    <DropdownMenuItem>Billing</DropdownMenuItem>
-    <DropdownMenuItem>Team</DropdownMenuItem>
-    <DropdownMenuItem>Subscription</DropdownMenuItem>
-  </DropdownMenuContent>
-</DropdownMenu>
+                    <DropdownMenuTrigger>
+                      Delete
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-40">
+                      <DropdownMenuItem
+                        className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer"
+                        onClick={(e) => handleDeleteClick(asset.id, e)}
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 {/* Location Info */}
