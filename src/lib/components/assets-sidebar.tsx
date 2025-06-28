@@ -90,7 +90,7 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-4 w-4"
+                        className="h-8 w-4"
                       >
                         <MoreHorizontal className="w-4 h-4" />
                       </Button>
