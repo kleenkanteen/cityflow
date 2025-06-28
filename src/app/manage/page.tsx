@@ -27,67 +27,111 @@ interface Asset {
 export default function ManagePage() {
   const [mapInfo, setMapInfo] = useState<MapInfo | null>(null);
   const [map, setMap] = useState<MapLibreMap | null>(null);
-  const [tileBoundaries, setTileBoundaries] = useState<boolean>(false);
-  const [shards, setShards] = useState<object | null>(null);
-  const [showShards, setShowShards] = useState<boolean>(false);
+  
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [currentAsset, setCurrentAsset] = useState<Asset | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [assetToDelete, setAssetToDelete] = useState<string | null>(null);
 
-  //   const [assets, setAssets] = useState<Asset[]>([]);
-  //   const [currentAsset, setCurrentAsset] = useState<Asset | null>(null);
-  //   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  //   const [assetToDelete, setAssetToDelete] = useState<string | null>(null);
+  function handleAssetsChange(newAssets: Asset[]) {
+    setAssets(newAssets);
+    // If current asset was deleted, clear selection
+    if (currentAsset && !newAssets.find((a) => a.id === currentAsset.id)) {
+      setCurrentAsset(null);
+    }
+  }
 
-  //   function handleAssetsChange(newAssets: Asset[]) {
-  //     setAssets(newAssets);
-  //     // If current asset was deleted, clear selection
-  //     if (currentAsset && !newAssets.find((a) => a.id === currentAsset.id)) {
-  //       setCurrentAsset(null);
-  //     }
-  //   }
+  function handleAssetSelect(asset: Asset) {
+    setCurrentAsset(asset);
+  }
 
-  //   function handleAssetSelect(asset: Asset) {
-  //     setCurrentAsset(asset);
-  //   }
+  function handleAssetDelete(assetId: string) {
+    setAssetToDelete(assetId);
+    setIsDeleteDialogOpen(true);
+  }
 
-  //   function handleAssetDelete(assetId: string) {
-  //     setAssetToDelete(assetId);
-  //     setIsDeleteDialogOpen(true);
-  //   }
+  function handleConfirmDelete() {
+    if (assetToDelete) {
+      const updatedAssets = assets.filter(
+        (asset) => asset.id !== assetToDelete
+      );
+      setAssets(updatedAssets);
 
-  //   function handleConfirmDelete() {
-  //     if (assetToDelete) {
-  //       const updatedAssets = assets.filter(
-  //         (asset) => asset.id !== assetToDelete
-  //       );
-  //       setAssets(updatedAssets);
+      // Clear current asset if it was deleted
+      if (currentAsset?.id === assetToDelete) {
+        setCurrentAsset(null);
+      }
 
-  //       // Clear current asset if it was deleted
-  //       if (currentAsset?.id === assetToDelete) {
-  //         setCurrentAsset(null);
-  //       }
+      setAssetToDelete(null);
+    }
+    setIsDeleteDialogOpen(false);
+  }
 
-  //       setAssetToDelete(null);
-  //     }
-  //     setIsDeleteDialogOpen(false);
-  //   }
-
-  //   function handleCancelDelete() {
-  //     setAssetToDelete(null);
-  //     setIsDeleteDialogOpen(false);
-  //   }
+  function handleCancelDelete() {
+    setAssetToDelete(null);
+    setIsDeleteDialogOpen(false);
+  }
 
   return (
     <div className="flex w-full h-screen">
-      <div className="w-1/5 h-full">
-        <div className="flex flex-col items-center justify-center pt-4">
-          <h2 className="text-2xl font-bold">Assets</h2>
+      {/* Header */}
+      <div className="absolute top-0 left-0 right-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
+        <h1 className="text-2xl font-bold text-gray-900">Manage Assets</h1>
+        <p className="text-sm text-gray-600 mt-1">
+          Click anywhere on the map to add new assets. Select assets from the sidebar to highlight them.
+        </p>
+      </div>
+
+      {/* Main Content - with top padding for header */}
+      <div className="flex w-full h-full pt-20">
+        {/* Sidebar */}
+        <div className="w-80 h-full">
+          <AssetsSidebar
+            assets={assets}
+            currentAsset={currentAsset}
+            onAssetSelect={handleAssetSelect}
+            onAssetDelete={handleAssetDelete}
+          />
+        </div>
+
+        {/* Map */}
+        <div className="flex-1 h-full">
+          <ManageAssetsMap
+            onInit={(map) => setMap(map)}
+            onMove={(info) => setMapInfo(info)}
+            assets={assets}
+            onAssetsChange={handleAssetsChange}
+            currentAsset={currentAsset}
+          />
         </div>
       </div>
-      <div className="w-4/5 h-full">
-        <ManageAssetsMap
-          onInit={(map) => setMap(map)}
-          onMove={(info) => setMapInfo(info)}
-        />
-      </div>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete Asset</DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <p className="text-sm text-gray-600">
+              Are you sure you want to delete this asset? This action cannot be undone.
+            </p>
+          </div>
+
+          <DialogFooter className="flex gap-2">
+            <Button variant="outline" onClick={handleCancelDelete}>
+              Cancel
+            </Button>
+            <Button 
+              variant="destructive"
+              onClick={handleConfirmDelete}
+            >
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
