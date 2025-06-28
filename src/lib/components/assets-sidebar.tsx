@@ -85,7 +85,7 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
             {assets.map((asset) => (
               <div
                 key={asset.id}
-                className={`group relative bg-white border rounded-xl px-4 py-4 transition-all duration-200`}
+                className={`bg-white border rounded-xl px-4 py-4`}
               >
                 {/* Asset Header */}
                 <div className="flex items-start justify-between mb-4">
