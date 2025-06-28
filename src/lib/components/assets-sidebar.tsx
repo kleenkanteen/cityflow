@@ -33,16 +33,6 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null)
 
-  function handleAssetClick(asset: Asset, e: React.MouseEvent) {
-    // Only select asset if not clicking on delete button
-    const target = e.target as HTMLElement;
-    const isDeleteButton = target.closest('[data-delete-trigger]');
-    
-    if (!isDeleteButton) {
-      onAssetSelect(asset);
-    }
-  }
-
   function handleDeleteClick(asset: Asset, e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
@@ -96,7 +86,6 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
               <div
                 key={asset.id}
                 className={`group relative bg-white border rounded-xl px-4 py-4 transition-all duration-200`}
-                onClick={(e) => handleAssetClick(asset, e)}
               >
                 {/* Asset Header */}
                 <div className="flex items-start justify-between mb-4">
