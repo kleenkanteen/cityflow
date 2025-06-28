@@ -28,7 +28,7 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
   return (
     <div className="bg-white border-r border-gray-100 flex flex-col h-full">
       {/* Sidebar Header */}
-      <div className="px-6 py-5 border-b border-gray-50">
+      <div className="px-6 py-5 border-b border-gray-50 pb-8">
         <div className="flex items-center space-x-3">
           <div className="p-2 bg-blue-50 rounded-lg">
             <Package className="h-5 w-5 text-blue-600" />
@@ -53,7 +53,7 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
             </p>
           </div>
         ) : (
-          <div className="flex flex-col overflow-y-auto p-4 space-y-4 pb-8">
+          <div className="flex flex-col overflow-y-auto p-4 space-y-4">
             {assets.map((asset) => (
               <div
                 key={asset.id}
