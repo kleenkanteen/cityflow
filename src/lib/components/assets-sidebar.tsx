@@ -71,7 +71,7 @@ export default function AssetsSidebar({
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-medium text-gray-900 truncate">
+                    <h3 className="font-sm text-gray-900 truncate">
                       {asset.name}
                     </h3>
                     {asset.description && (
