@@ -84,3 +84,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+@layer utilities {
+  .border-border {
+    border-color: hsl(var(--border));
+  }
+}

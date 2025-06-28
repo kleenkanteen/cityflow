@@ -2,7 +2,10 @@
 
 import React, { useState } from "react";
 import AssetsSidebar from "@/src/lib/components/assets-sidebar";
-import ManageAssetsMap from "@/src/lib/components/manage-assets-map";
+import { Map as MapLibreMap } from "maplibre-gl";
+import ManageAssetsMap, {
+  MapInfo,
+} from "@/src/lib/components/manage-assets-map";
 import {
   Dialog,
   DialogContent,
@@ -22,103 +25,69 @@ interface Asset {
 }
 
 export default function ManagePage() {
-  const [assets, setAssets] = useState<Asset[]>([]);
-  const [currentAsset, setCurrentAsset] = useState<Asset | null>(null);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [assetToDelete, setAssetToDelete] = useState<string | null>(null);
+  const [mapInfo, setMapInfo] = useState<MapInfo | null>(null);
+  const [map, setMap] = useState<MapLibreMap | null>(null);
+  const [tileBoundaries, setTileBoundaries] = useState<boolean>(false);
+  const [shards, setShards] = useState<object | null>(null);
+  const [showShards, setShowShards] = useState<boolean>(false);
 
-  function handleAssetsChange(newAssets: Asset[]) {
-    setAssets(newAssets);
-    // If current asset was deleted, clear selection
-    if (currentAsset && !newAssets.find(a => a.id === currentAsset.id)) {
-      setCurrentAsset(null);
-    }
-  }
+  //   const [assets, setAssets] = useState<Asset[]>([]);
+  //   const [currentAsset, setCurrentAsset] = useState<Asset | null>(null);
+  //   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  //   const [assetToDelete, setAssetToDelete] = useState<string | null>(null);
 
-  function handleAssetSelect(asset: Asset) {
-    setCurrentAsset(asset);
-  }
+  //   function handleAssetsChange(newAssets: Asset[]) {
+  //     setAssets(newAssets);
+  //     // If current asset was deleted, clear selection
+  //     if (currentAsset && !newAssets.find((a) => a.id === currentAsset.id)) {
+  //       setCurrentAsset(null);
+  //     }
+  //   }
 
-  function handleAssetDelete(assetId: string) {
-    setAssetToDelete(assetId);
-    setIsDeleteDialogOpen(true);
-  }
+  //   function handleAssetSelect(asset: Asset) {
+  //     setCurrentAsset(asset);
+  //   }
 
-  function handleConfirmDelete() {
-    if (assetToDelete) {
-      const updatedAssets = assets.filter(asset => asset.id !== assetToDelete);
-      setAssets(updatedAssets);
-      
-      // Clear current asset if it was deleted
-      if (currentAsset?.id === assetToDelete) {
-        setCurrentAsset(null);
-      }
-      
-      setAssetToDelete(null);
-    }
-    setIsDeleteDialogOpen(false);
-  }
+  //   function handleAssetDelete(assetId: string) {
+  //     setAssetToDelete(assetId);
+  //     setIsDeleteDialogOpen(true);
+  //   }
 
-  function handleCancelDelete() {
-    setAssetToDelete(null);
-    setIsDeleteDialogOpen(false);
-  }
+  //   function handleConfirmDelete() {
+  //     if (assetToDelete) {
+  //       const updatedAssets = assets.filter(
+  //         (asset) => asset.id !== assetToDelete
+  //       );
+  //       setAssets(updatedAssets);
+
+  //       // Clear current asset if it was deleted
+  //       if (currentAsset?.id === assetToDelete) {
+  //         setCurrentAsset(null);
+  //       }
+
+  //       setAssetToDelete(null);
+  //     }
+  //     setIsDeleteDialogOpen(false);
+  //   }
+
+  //   function handleCancelDelete() {
+  //     setAssetToDelete(null);
+  //     setIsDeleteDialogOpen(false);
+  //   }
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex-shrink-0">
-        <h1 className="text-2xl font-bold text-gray-900">Manage Assets</h1>
-        <p className="text-sm text-gray-600 mt-1">
-          Click anywhere on the map to add new assets. Drag markers to reposition them.
-        </p>
+    <div className="flex w-full h-screen">
+      <div className="w-1/5 h-full">
+        <div className="flex flex-col items-center justify-center pt-4">
+          <h2 className="text-2xl font-bold">Assets</h2>
+        </div>
       </div>
-
-      {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <AssetsSidebar
-          assets={assets}
-          currentAsset={currentAsset}
-          onAssetSelect={handleAssetSelect}
-          onAssetDelete={handleAssetDelete}
-        />
-
-        {/* Map */}
+      <div className="w-4/5 h-full">
         <ManageAssetsMap
-          assets={assets}
-          currentAsset={currentAsset}
-          onAssetsChange={handleAssetsChange}
-          onAssetSelect={handleAssetSelect}
+          onInit={(map) => setMap(map)}
+          onMove={(info) => setMapInfo(info)}
         />
       </div>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Delete Asset</DialogTitle>
-          </DialogHeader>
-          
-          <div className="py-4">
-            <p className="text-sm text-gray-600">
-              Are you sure you want to delete this asset? This action cannot be undone.
-            </p>
-          </div>
-
-          <DialogFooter className="flex gap-2">
-            <Button variant="outline" onClick={handleCancelDelete}>
-              Cancel
-            </Button>
-            <Button 
-              variant="destructive"
-              onClick={handleConfirmDelete}
-            >
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

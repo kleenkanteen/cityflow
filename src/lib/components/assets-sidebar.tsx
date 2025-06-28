@@ -20,14 +20,14 @@ interface AssetsSidebarProps {
   onAssetDelete: (assetId: string) => void;
 }
 
-export default function AssetsSidebar({ 
-  assets, 
-  currentAsset, 
-  onAssetSelect, 
-  onAssetDelete 
+export default function AssetsSidebar({
+  assets,
+  currentAsset,
+  onAssetSelect,
+  onAssetDelete,
 }: AssetsSidebarProps) {
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full">
+    <div className="bg-white border-r border-gray-200 flex flex-col h-full overflow-hidden">
       {/* Sidebar Header */}
       <div className="p-6 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-800">
@@ -56,8 +56,8 @@ export default function AssetsSidebar({
                 key={asset.id}
                 className={`bg-gray-50 rounded-lg p-4 border transition-all cursor-pointer ${
                   currentAsset?.id === asset.id
-                    ? 'border-blue-300 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? "border-blue-300 bg-blue-50"
+                    : "border-gray-200 hover:border-gray-300"
                 }`}
                 onClick={() => onAssetSelect(asset)}
               >
