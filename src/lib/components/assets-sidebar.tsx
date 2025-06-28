@@ -85,22 +85,29 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
             {assets.map((asset) => (
               <div
                 key={asset.id}
-                className={`bg-white border rounded-xl px-4 py-4`}
+                className={`group relative bg-white border border-gray-100 rounded-xl p-5 hover:border-gray-200 hover:shadow-sm transition-all duration-200 cursor-pointer ${
+                  currentAsset?.id === asset.id
+                    ? "border-blue-300 bg-blue-50"
+                    : ""
+                }`}
+                onClick={() => onAssetSelect(asset)}
               >
                 {/* Asset Header */}
                 <div className="flex items-start justify-between mb-4">
-                  <div className="">
+                  <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-gray-900 mb-2">{asset.name}</h3>
                     <p className="text-sm text-gray-500 leading-relaxed">{asset.description}</p>
                   </div>
 
                   {/* Delete Button */}
-                  <button
-                    className="group-hover:opacity-100 transition-opacity h-8 w-8 p-0 text-gray-400 hover:text-red-400 hover:bg-red-50 cursor-pointer"
+                  <Button
                     onClick={(e) => handleDeleteClick(asset, e)}
+                    variant="ghost"
+                    size="sm"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
                   >
-                    <Trash2 className="w-4 h-4 text-white" />
-                  </button>
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
                 </div>
 
                 {/* Location Info */}
