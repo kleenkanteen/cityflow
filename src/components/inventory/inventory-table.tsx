@@ -76,10 +76,8 @@ export function InventoryTable({ items, onItemUpdated, onItemDeleted }: Inventor
   function getStockBadge(quantity: number) {
     if (quantity === 0) {
       return <Badge variant="destructive">Out of Stock</Badge>;
-    } else if (quantity <= 5) {
+    } else if (quantity <= 2) {
       return <Badge variant="secondary">Low Stock</Badge>;
-    } else if (quantity <= 10) {
-      return <Badge variant="outline">Medium Stock</Badge>;
     } else {
       return <Badge variant="default">In Stock</Badge>;
     }
@@ -88,16 +86,18 @@ export function InventoryTable({ items, onItemUpdated, onItemDeleted }: Inventor
   return (
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+        <div className="relative max-w-sm flex-1">
           <Input
             placeholder="Search inventory..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-8"
+            className="pl-14"
+            aria-label="Search inventory"
           />
         </div>
       </div>
+
+      <br></br>
 
       <div className="rounded-md border">
         <Table>

@@ -4,7 +4,6 @@ import React from 'react';
 import { Package, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { AddItemDialog } from '@/src/components/inventory/add-item-dialog';
 import { InventoryTable } from '@/src/components/inventory/inventory-table';
 import { InventoryItem } from '@/src/types/inventory';
@@ -83,7 +82,7 @@ export default function InventoryPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardDescription className="text-sm font-medium text-gray-600">
-                    Total Items
+                    Total Unique Items
                   </CardDescription>
                   <CardTitle className="text-2xl font-bold text-gray-900">
                     {items.length}
@@ -125,11 +124,7 @@ export default function InventoryPage() {
                     <CardTitle className="text-2xl font-bold text-gray-900">
                       {lowStockCount}
                     </CardTitle>
-                    {lowStockCount > 0 && (
-                      <Badge variant="destructive" className="text-xs">
-                        Alert
-                      </Badge>
-                    )}
+                    {lowStockCount > 0}
                   </div>
                 </div>
                 <div className="bg-orange-100 p-3 rounded-lg">
