@@ -90,9 +90,9 @@ export default function AssetsSidebar({ assets, currentAsset, onAssetSelect, onA
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-8 w-8"
+                        className="h-4 w-4"
                       >
-                        <MoreHorizontal className="w-8 h-8" />
+                        <MoreHorizontal className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-40">
