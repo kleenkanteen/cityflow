@@ -5,6 +5,7 @@ import {
   boolean,
   integer,
   uuid,
+  decimal,
 } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
@@ -78,4 +79,13 @@ export const inventoryItem = pgTable("inventory_item", {
   updatedAt: timestamp("updated_at")
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
+});
+
+export const asset = pgTable("asset", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  description: text("description"),
+  lng: decimal("lng").notNull(),
+  lat: decimal("lat").notNull(),
+  color: text("color").notNull(),
 });
