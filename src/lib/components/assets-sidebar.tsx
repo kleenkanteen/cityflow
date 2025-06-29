@@ -194,11 +194,15 @@ export default function AssetsSidebar({
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <h3 className="font-sm font-semibold text-gray-900 truncate">
-                      {asset.name}
+                      {asset.name.length > 30
+                        ? `${asset.name.substring(0, 30)}...`
+                        : asset.name}
                     </h3>
                     {asset.description && (
                       <p className="text-xs text-gray-600 mt-1 line-clamp-2">
-                        {asset.description}
+                        {asset.description.length > 40
+                          ? `${asset.description.substring(0, 40)}...`
+                          : asset.description}
                       </p>
                     )}
                     <div className="flex items-center mt-2 text-xs text-gray-500">
