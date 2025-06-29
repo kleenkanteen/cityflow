@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 const STYLE = `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_API_KEY}`;
 
@@ -58,9 +58,11 @@ export default function ManageAssetsMap({
   const mapRef = useRef<maplibregl.Map | null>(null);
   const markersRef = useRef<Marker[]>([]);
   const [mapLoaded, setMapLoaded] = useState(false);
-  
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [clickLocation, setClickLocation] = useState<ClickLocation | null>(null);
+  const [clickLocation, setClickLocation] = useState<ClickLocation | null>(
+    null
+  );
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -84,18 +86,18 @@ export default function ManageAssetsMap({
 
   // Handle form input changes
   function handleInputChange(field: string, value: string) {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   }
 
   // Handle form submission
   async function handleAddAsset() {
     if (!formData.name.trim()) return;
-    
+
     setIsCreating(true);
-    
+
     try {
       const assetId = uuidv4();
       const newAssetData = {
@@ -104,13 +106,13 @@ export default function ManageAssetsMap({
         description: formData.description,
         lng: parseFloat(formData.lng),
         lat: parseFloat(formData.lat),
-        color: '#3b82f6'
+        color: "#3b82f6",
       };
 
-      const response = await fetch('/api/assets/create', {
-        method: 'POST',
+      const response = await fetch("/api/assets/create", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(newAssetData),
       });
@@ -118,17 +120,17 @@ export default function ManageAssetsMap({
       if (response.status === 200) {
         // Success - add to local state and show success toast
         onAssetsChange([...assets, newAssetData]);
-        toast.success('Asset created successfully!');
+        toast.success("Asset created successfully!");
         setIsDialogOpen(false);
         setFormData({ name: "", description: "", lng: "", lat: "" });
         setClickLocation(null);
       } else {
         // Error - show error toast
-        toast.error('Failed to create asset. Try again later.');
+        toast.error("Failed to create asset. Try again later.");
       }
     } catch (error) {
-      console.error('Error creating asset:', error);
-      toast.error('Failed to create asset. Try again later.');
+      console.error("Error creating asset:", error);
+      toast.error("Failed to create asset. Try again later.");
     } finally {
       setIsCreating(false);
     }
@@ -163,9 +165,9 @@ export default function ManageAssetsMap({
     );
 
     // Wait for map to load before adding event listeners
-    map.on('load', () => {
+    map.on("load", () => {
       setMapLoaded(true);
-      map.on('click', handleMapClick);
+      map.on("click", handleMapClick);
     });
 
     map.on("move", () =>
@@ -195,11 +197,11 @@ export default function ManageAssetsMap({
     if (!mapRef.current || !mapLoaded) return;
 
     // Remove all existing markers
-    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
 
     // Create new markers for all assets
-    const newMarkers = assets.map(asset => {
+    const newMarkers = assets.map((asset) => {
       const marker = new Marker({
         color: asset.color,
         draggable: true,
@@ -208,12 +210,10 @@ export default function ManageAssetsMap({
         .addTo(mapRef.current!);
 
       // Update asset position when dragged
-      marker.on('dragend', () => {
+      marker.on("dragend", () => {
         const lngLat = marker.getLngLat();
-        const updatedAssets = assets.map(a => 
-          a.id === asset.id 
-            ? { ...a, lng: lngLat.lng, lat: lngLat.lat }
-            : a
+        const updatedAssets = assets.map((a) =>
+          a.id === asset.id ? { ...a, lng: lngLat.lng, lat: lngLat.lat } : a
         );
         onAssetsChange(updatedAssets);
       });
@@ -225,16 +225,13 @@ export default function ManageAssetsMap({
 
     // Cleanup function
     return () => {
-      newMarkers.forEach(marker => marker.remove());
+      newMarkers.forEach((marker) => marker.remove());
     };
   }, [assets, mapLoaded]);
 
   return (
     <>
-      <div 
-        ref={mapContainerRef} 
-        className="w-full h-full"
-      >
+      <div ref={mapContainerRef} className="w-full h-full">
         {children}
       </div>
 
@@ -244,7 +241,7 @@ export default function ManageAssetsMap({
           <DialogHeader>
             <DialogTitle>Add New Asset</DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="name">Asset Name *</Label>
@@ -252,23 +249,25 @@ export default function ManageAssetsMap({
                 id="name"
                 placeholder="Enter asset name"
                 value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
+                onChange={(e) => handleInputChange("name", e.target.value)}
                 disabled={isCreating}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
                 placeholder="Enter asset description (optional)"
                 value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("description", e.target.value)
+                }
                 rows={3}
                 disabled={isCreating}
               />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="longitude">Longitude</Label>
@@ -278,11 +277,11 @@ export default function ManageAssetsMap({
                   step="any"
                   placeholder="Longitude"
                   value={formData.lng}
-                  onChange={(e) => handleInputChange('lng', e.target.value)}
+                  onChange={(e) => handleInputChange("lng", e.target.value)}
                   disabled={isCreating}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="latitude">Latitude</Label>
                 <Input
@@ -291,7 +290,7 @@ export default function ManageAssetsMap({
                   step="any"
                   placeholder="Latitude"
                   value={formData.lat}
-                  onChange={(e) => handleInputChange('lat', e.target.value)}
+                  onChange={(e) => handleInputChange("lat", e.target.value)}
                   disabled={isCreating}
                 />
               </div>
@@ -299,14 +298,18 @@ export default function ManageAssetsMap({
           </div>
 
           <DialogFooter className="flex gap-2">
-            <Button variant="outline" onClick={handleCancel} disabled={isCreating}>
+            <Button
+              variant="outline"
+              onClick={handleCancel}
+              disabled={isCreating}
+            >
               Cancel
             </Button>
-            <Button 
+            <Button
               onClick={handleAddAsset}
               disabled={!formData.name.trim() || isCreating}
             >
-              {isCreating ? 'Creating...' : 'Add Asset'}
+              {isCreating ? "Creating..." : "Add Asset"}
             </Button>
           </DialogFooter>
         </DialogContent>
