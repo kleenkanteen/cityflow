@@ -20,8 +20,8 @@ export async function POST(request: NextRequest) {
         id,
         name,
         description: description || null,
-        lng: lng.toString(),
-        lat: lat.toString(),
+        lng,
+        lat,
         color,
       })
       .returning();
