@@ -6,6 +6,8 @@ import { Map as MapLibreMap } from "maplibre-gl";
 import { Settings, MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 
+const ManageAssetsMap = dynamic(() => import('@/src/lib/components/manage-assets-map'), { ssr: false });
+
 interface Asset {
   id: string;
   name: string;
