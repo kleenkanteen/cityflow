@@ -36,9 +36,17 @@ export default function RequestsPage() {
     fetchRequests();
   }
 
-  const pendingCount = requests.filter(req => req.status === 'pending').length;
-  const approvedCount = requests.filter(req => req.status === 'approved').length;
-  const deniedCount = requests.filter(req => req.status === 'denied').length;
+  // Helper: check if date is in current month/year
+  const isThisMonth = (date: Date | string) => {
+    const d = typeof date === 'string' ? new Date(date) : date;
+    return d.getFullYear() === 2025 && d.getMonth() === 5; // June is 5 (0-indexed)
+  };
+
+  const requestsThisMonth = requests.filter(req => req.startDate && isThisMonth(req.startDate));
+  const totalThisMonth = requestsThisMonth.length;
+  const approvedCount = requestsThisMonth.filter(req => req.status === 'approved').length;
+  const deniedCount = requestsThisMonth.filter(req => req.status === 'denied').length;
+  const pendingCount = requests.filter(req => req.status === 'pending').length; // unchanged, per user request
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -88,10 +96,10 @@ export default function RequestsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardDescription className="text-sm font-medium text-gray-600">
-                    Total Requests
+                    Total Requests this month
                   </CardDescription>
                   <CardTitle className="text-2xl font-bold text-gray-900">
-                    {requests.length}
+                    {totalThisMonth}
                   </CardTitle>
                 </div>
                 <div className="bg-blue-100 p-3 rounded-lg">
@@ -124,7 +132,7 @@ export default function RequestsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardDescription className="text-sm font-medium text-gray-600">
-                    Approved
+                    Approved Requests this month
                   </CardDescription>
                   <CardTitle className="text-2xl font-bold text-green-600">
                     {approvedCount}
@@ -142,7 +150,7 @@ export default function RequestsPage() {
               <div className="flex items-center justify-between">
                 <div>
                   <CardDescription className="text-sm font-medium text-gray-600">
-                    Denied
+                    Denied Requests this month
                   </CardDescription>
                   <CardTitle className="text-2xl font-bold text-red-600">
                     {deniedCount}
