@@ -6,22 +6,6 @@ import { Map as MapLibreMap } from "maplibre-gl";
 import { Settings, MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 
-// Dynamically import ManageAssetsMap with SSR disabled to prevent CSS extraction issues
-const ManageAssetsMap = dynamic(
-  () => import("@/src/lib/components/manage-assets-map"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="w-full h-full flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
-          <p className="text-sm text-gray-600">Loading map...</p>
-        </div>
-      </div>
-    ),
-  }
-);
-
 interface Asset {
   id: string;
   name: string;
