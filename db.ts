@@ -3,5 +3,17 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
 config({ path: ".env" });
-const client = postgres(process.env.DATABASE_URL!);
-export const db = drizzle({ client });
+
+const db = drizzle(
+  postgres(process.env.DATABASE_URL!, {
+    prepare: false,
+  }),
+  { schema },
+);
+
+declare global {
+  var database: PostgresJsDatabase<typeof schema> | undefined;
+}
+
+export const db = global.database || drizzleClient;
+if (process.env.NODE_ENV !== "production") global.database = db;
