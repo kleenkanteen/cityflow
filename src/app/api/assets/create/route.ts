@@ -7,8 +7,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { id, name, description, lng, lat, color } = body;
 
-    console.log(body)
-    
+    console.log(body);
 
     if (!id || !name || lng === undefined || lat === undefined || !color) {
       return NextResponse.json(
@@ -23,8 +22,8 @@ export async function POST(request: NextRequest) {
         id,
         name,
         description: description || null,
-        lng,
-        lat,
+        lng: lng.toString(),
+        lat: lat.toString(),
         color,
       })
       .returning();
