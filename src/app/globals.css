@@ -16,8 +16,6 @@
   }
 }
 
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -82,12 +80,5 @@
   }
   body {
     @apply bg-background text-foreground;
-  }
-}
-
-
-@layer utilities {
-  .border-border {
-    border-color: hsl(var(--border));
   }
 }
