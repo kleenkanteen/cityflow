@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating asset:', error);
     return NextResponse.json(
-      { error: 'Failed to create asset' },
+      { error: 'Failed to create asset: ', error },
       { status: 500 }
     );
   }
