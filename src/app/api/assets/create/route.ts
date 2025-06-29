@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     //   })
     //   .returning();
 
-    return NextResponse.json({status: 200}, { status: 200 });
+    return NextResponse.json({status: 400}, { status: 200 });
   } catch (error) {
     console.error('Error creating asset:', error);
     return NextResponse.json(
