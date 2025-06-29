@@ -16,6 +16,7 @@ import {
   Clock,
   Phone,
 } from 'lucide-react';
+import Link from 'next/link';
 
 function App() {
   return (
@@ -47,6 +48,11 @@ function App() {
               >
                 Case Studies
               </a>
+              <Link href="/request-equipment">
+                <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                  Request Equipment
+                </button>
+              </Link>
               <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                 Book a Demo
               </button>
@@ -75,6 +81,12 @@ function App() {
                 <Calendar className="h-5 w-5" />
                 <span>Book a Demo</span>
               </button>
+              <Link href="/request-equipment">
+                <button className="bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-700 transition-all transform hover:scale-105 flex items-center justify-center space-x-2">
+                  <Package className="h-5 w-5" />
+                  <span>Request Equipment</span>
+                </button>
+              </Link>
               <button className="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-600 hover:text-white transition-all flex items-center justify-center space-x-2">
                 <Play className="h-5 w-5" />
                 <span>Watch How It Works</span>
