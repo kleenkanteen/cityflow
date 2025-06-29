@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Trash2, MapPin, Plus } from "lucide-react";
+import { Trash2, MapPin, Plus, Edit } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -10,6 +10,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
 interface Asset {
@@ -35,12 +38,90 @@ export default function AssetsSidebar({
   onToggleAddingAsset,
 }: AssetsSidebarProps) {
   const [deleteAssetDialog, setDeleteAssetDialog] = useState(false);
+  const [editAssetDialog, setEditAssetDialog] = useState(false);
   const [assetToDelete, setAssetToDelete] = useState<string | null>(null);
+  const [assetToEdit, setAssetToEdit] = useState<Asset | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    name: "",
+    description: "",
+    lng: "",
+    lat: "",
+  });
 
   function handleDeleteClick(assetId: string) {
     setDeleteAssetDialog(true);
     setAssetToDelete(assetId);
+  }
+
+  function handleEditClick(asset: Asset) {
+    setAssetToEdit(asset);
+    setEditFormData({
+      name: asset.name,
+      description: asset.description || "",
+      lng: asset.lng.toString(),
+      lat: asset.lat.toString(),
+    });
+    setEditAssetDialog(true);
+  }
+
+  function handleEditInputChange(field: string, value: string) {
+    setEditFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  }
+
+  async function handleUpdateAsset() {
+    if (!assetToEdit || !editFormData.name.trim()) return;
+
+    setIsUpdating(true);
+
+    try {
+      const updatedAssetData = {
+        name: editFormData.name,
+        description: editFormData.description,
+        lng: parseFloat(editFormData.lng),
+        lat: parseFloat(editFormData.lat),
+        color: assetToEdit.color,
+      };
+
+      const response = await fetch(`/api/assets/${assetToEdit.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedAssetData),
+      });
+
+      if (response.status === 200) {
+        // Success - update local state and show success toast
+        const updatedAssets = assets.map((asset) =>
+          asset.id === assetToEdit.id
+            ? { ...asset, ...updatedAssetData }
+            : asset
+        );
+        onAssetsChange(updatedAssets);
+        toast.success("Asset updated successfully!");
+        setEditAssetDialog(false);
+        setAssetToEdit(null);
+      } else {
+        // Error - show error toast
+        toast.error("Failed to update asset. Try again later.");
+      }
+    } catch (error) {
+      console.error("Error updating asset:", error);
+      toast.error("Failed to update asset. Try again later.");
+    } finally {
+      setIsUpdating(false);
+    }
+  }
+
+  function handleCancelEdit() {
+    setAssetToEdit(null);
+    setEditAssetDialog(false);
+    setEditFormData({ name: "", description: "", lng: "", lat: "" });
   }
 
   async function handleConfirmDelete() {
@@ -127,21 +208,112 @@ export default function AssetsSidebar({
                       </span>
                     </div>
                   </div>
-                  <Button
-                    onClick={() => handleDeleteClick(asset.id)}
-                    variant="destructive"
-                    size="sm"
-                    className="h-8 w-8 p-0 ml-2 flex-shrink-0"
-                    disabled={isDeleting}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex gap-1 ml-2 flex-shrink-0">
+                    <Button
+                      onClick={() => handleEditClick(asset)}
+                      variant="outline"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      disabled={isUpdating || isDeleting}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      onClick={() => handleDeleteClick(asset.id)}
+                      variant="destructive"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      disabled={isDeleting || isUpdating}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Edit Asset Dialog */}
+      <Dialog open={editAssetDialog} onOpenChange={setEditAssetDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Asset</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Asset Name *</Label>
+              <Input
+                id="edit-name"
+                placeholder="Enter asset name"
+                value={editFormData.name}
+                onChange={(e) => handleEditInputChange("name", e.target.value)}
+                disabled={isUpdating}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-description">Description</Label>
+              <Textarea
+                id="edit-description"
+                placeholder="Enter asset description (optional)"
+                value={editFormData.description}
+                onChange={(e) =>
+                  handleEditInputChange("description", e.target.value)
+                }
+                rows={3}
+                disabled={isUpdating}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-longitude">Longitude</Label>
+                <Input
+                  id="edit-longitude"
+                  type="number"
+                  step="any"
+                  placeholder="Longitude"
+                  value={editFormData.lng}
+                  onChange={(e) => handleEditInputChange("lng", e.target.value)}
+                  disabled={isUpdating}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit-latitude">Latitude</Label>
+                <Input
+                  id="edit-latitude"
+                  type="number"
+                  step="any"
+                  placeholder="Latitude"
+                  value={editFormData.lat}
+                  onChange={(e) => handleEditInputChange("lat", e.target.value)}
+                  disabled={isUpdating}
+                />
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handleCancelEdit}
+              disabled={isUpdating}
+            >
+              Close
+            </Button>
+            <Button
+              onClick={handleUpdateAsset}
+              disabled={!editFormData.name.trim() || isUpdating}
+            >
+              {isUpdating ? "Updating..." : "Update"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteAssetDialog} onOpenChange={setDeleteAssetDialog}>
