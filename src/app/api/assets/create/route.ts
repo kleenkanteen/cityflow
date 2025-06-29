@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/db';
+import { db } from './db';
 import { asset } from '@/src/db/schema';
 
 export async function POST(request: NextRequest) {
@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
 
     if (!id || !name || lng === undefined || lat === undefined || !color) {
       return NextResponse.json(
-        { error: 'Missing required fields: id, name, lng, lat, color' },
+        { error: 'Missing required fields.' },
         { status: 400 }
       );
     }
