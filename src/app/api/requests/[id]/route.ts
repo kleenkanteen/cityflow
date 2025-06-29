@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
-import { equipmentRequest } from '@/src/db/schema';
+import { equipmentRequest, inventoryItem } from '@/src/db/schema';
 import { eq } from 'drizzle-orm';
 import { UpdateRequestStatusRequest } from '@/src/types/request';
 import { sendRequestApprovalEmail, sendRequestDenialEmail } from '@/src/lib/resend';
@@ -28,7 +28,6 @@ export async function PUT(
       );
     }
 
-    // Get the current request details for email
     const currentRequest = await db
       .select()
       .from(equipmentRequest)
@@ -44,7 +43,6 @@ export async function PUT(
 
     const request_data = currentRequest[0];
 
-    // Update the request
     const updatedRequest = await db
       .update(equipmentRequest)
       .set({
@@ -62,11 +60,39 @@ export async function PUT(
       );
     }
 
-    // Send email notification
     const startDateStr = request_data.startDate.toLocaleDateString();
     const endDateStr = request_data.endDate.toLocaleDateString();
 
     if (status === 'approved') {
+      const inventory = await db
+        .select()
+        .from(inventoryItem)
+        .where(eq(inventoryItem.id, request_data.inventoryId))
+        .limit(1);
+
+      if (!inventory.length) {
+        return NextResponse.json(
+          { error: 'Inventory item not found' },
+          { status: 404 }
+        );
+      }
+
+      const { quantity: availableQuantity } = inventory[0];
+      if (availableQuantity < request_data.quantity) {
+        return NextResponse.json(
+          { error: 'Not enough inventory available to approve this request.' },
+          { status: 400 }
+        );
+      }
+
+      // decrement inventory since it got approved
+      await db.update(inventoryItem)
+        .set({
+          quantity: availableQuantity - request_data.quantity,
+          updatedAt: new Date(),
+        })
+        .where(eq(inventoryItem.id, request_data.inventoryId));
+
       await sendRequestApprovalEmail(
         request_data.requestorEmail,
         request_data.inventoryItemName,

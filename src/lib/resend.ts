@@ -15,7 +15,7 @@ export async function sendRequestApprovalEmail(
 ) {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'CityFlow <noreply@cityflow.com>',
+      from: 'sabih@sabih.dev',
       to: [requestorEmail],
       subject: 'Equipment Request Approved',
       html: `
@@ -64,7 +64,7 @@ export async function sendRequestDenialEmail(
 ) {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'CityFlow <noreply@cityflow.com>',
+      from: 'sabih@sabih.dev',
       to: [requestorEmail],
       subject: 'Equipment Request Denied',
       html: `
