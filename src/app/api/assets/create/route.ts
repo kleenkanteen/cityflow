@@ -16,19 +16,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const newAsset = await db
-      .insert(asset)
-      .values({
-        id,
-        name,
-        description: description || null,
-        lng,
-        lat,
-        color,
-      })
-      .returning();
+    // const newAsset = await db
+    //   .insert(asset)
+    //   .values({
+    //     id,
+    //     name,
+    //     description: description || null,
+    //     lng,
+    //     lat,
+    //     color,
+    //   })
+    //   .returning();
 
-    return NextResponse.json(newAsset[0], { status: 200 });
+    return NextResponse.json({status: 200}, { status: 200 });
   } catch (error) {
     console.error('Error creating asset:', error);
     return NextResponse.json(
