@@ -99,3 +99,19 @@ export const equipmentRequest = pgTable("equipment_request", {
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+
+export const complaint = pgTable("complaint", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name"),
+  email: text("email"),
+  description: text("description").notNull(),
+  location: text("location").notNull(),
+  imageUrl: text("image_url"),
+  status: text("status").notNull().default("pending"), // pending, in_progress, resolved
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
