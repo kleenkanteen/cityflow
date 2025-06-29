@@ -30,26 +30,27 @@ export default function ManagePage() {
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isAddingAsset, setIsAddingAsset] = useState(false);
 
   async function fetchAssets() {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/assets/all');
+      const response = await fetch("/api/assets/all");
       if (!response.ok) {
-        throw new Error('Failed to fetch assets');
+        throw new Error("Failed to fetch assets");
       }
       const data = await response.json();
-      
+
       // Convert decimal strings to numbers for lng/lat
       const processedAssets = data.map((asset: any) => ({
         ...asset,
         lng: parseFloat(asset.lng),
         lat: parseFloat(asset.lat),
       }));
-      
+
       setAssets(processedAssets);
     } catch (error) {
-      console.error('Error fetching assets:', error);
+      console.error("Error fetching assets:", error);
     } finally {
       setIsLoading(false);
     }
@@ -63,6 +64,10 @@ export default function ManagePage() {
     setAssets(newAssets);
   }
 
+  function handleToggleAddingAsset() {
+    setIsAddingAsset(!isAddingAsset);
+  }
+
   return (
     <div className="flex flex-col w-full h-screen">
       {/* Header - Fixed at top */}
@@ -74,14 +79,22 @@ export default function ManagePage() {
                 <Settings className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-                  Manage Assets
-                </h1>
+                <div className="flex items-center space-x-3">
+                  <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                    Manage Assets
+                  </h1>
+                  {isAddingAsset && (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      Adding Mode
+                    </span>
+                  )}
+                </div>
                 <div className="flex items-center space-x-2 mt-1">
                   <MapPin className="h-4 w-4 text-gray-500" />
                   <p className="text-sm text-gray-600">
-                    Click anywhere on the map to add new assets • Select assets
-                    to highlight them
+                    {isAddingAsset
+                      ? "Click anywhere on the map to add a new asset"
+                      : "Click 'Add Asset' in the sidebar to start adding assets • Drag existing markers to move them"}
                   </p>
                 </div>
               </div>
@@ -91,7 +104,7 @@ export default function ManagePage() {
             <div className="flex items-center space-x-3">
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">
-                  {isLoading ? '...' : assets.length}
+                  {isLoading ? "..." : assets.length}
                 </p>
                 <p className="text-xs text-gray-500">Total Assets</p>
               </div>
@@ -103,7 +116,12 @@ export default function ManagePage() {
       {/* Main Content */}
       <div className="flex w-full flex-1">
         <div className="w-1/4 h-full">
-          <AssetsSidebar assets={assets} onAssetsChange={handleAssetsChange} />
+          <AssetsSidebar
+            assets={assets}
+            onAssetsChange={handleAssetsChange}
+            isAddingAsset={isAddingAsset}
+            onToggleAddingAsset={handleToggleAddingAsset}
+          />
         </div>
         <div className="w-3/4 h-full">
           {!isLoading && (
@@ -112,6 +130,8 @@ export default function ManagePage() {
               onMove={(info) => setMapInfo(info as any)}
               assets={assets}
               onAssetsChange={handleAssetsChange}
+              isAddingAsset={isAddingAsset}
+              onAssetAdded={() => setIsAddingAsset(false)}
             />
           )}
           {isLoading && (

@@ -45,6 +45,8 @@ interface MapProps {
   onMove: (info: MapInfo) => void;
   assets: Asset[];
   onAssetsChange: (assets: Asset[]) => void;
+  isAddingAsset: boolean;
+  onAssetAdded: () => void;
 }
 
 export default function ManageAssetsMap({
@@ -53,6 +55,8 @@ export default function ManageAssetsMap({
   onMove,
   assets,
   onAssetsChange,
+  isAddingAsset,
+  onAssetAdded,
 }: MapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
@@ -73,6 +77,9 @@ export default function ManageAssetsMap({
 
   // Handle map click to open dialog
   function handleMapClick(e: any) {
+    // Only handle clicks if we're in adding mode
+    if (!isAddingAsset) return;
+
     const { lng, lat } = e.lngLat;
     setClickLocation({ lng, lat });
     setFormData({
@@ -124,6 +131,7 @@ export default function ManageAssetsMap({
         setIsDialogOpen(false);
         setFormData({ name: "", description: "", lng: "", lat: "" });
         setClickLocation(null);
+        onAssetAdded(); // Exit adding mode after successful creation
       } else {
         // Error - show error toast
         toast.error("Failed to create asset. Try again later.");
@@ -167,7 +175,6 @@ export default function ManageAssetsMap({
     // Wait for map to load before adding event listeners
     map.on("load", () => {
       setMapLoaded(true);
-      map.on("click", handleMapClick);
     });
 
     map.on("move", () =>
@@ -229,6 +236,22 @@ export default function ManageAssetsMap({
     };
   }, [assets, mapLoaded]);
 
+  // Update cursor style based on adding mode
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    const canvas = mapRef.current.getCanvas();
+    if (isAddingAsset) {
+      canvas.style.cursor = "crosshair";
+      mapRef.current.on("click", handleMapClick);
+    } else {
+      canvas.style.cursor = "";
+      mapRef.current.off("click", handleMapClick);
+    }
+
+    setIsDialogOpen(false);
+  }, [isAddingAsset]);
+
   return (
     <>
       <div ref={mapContainerRef} className="w-full h-full">
@@ -236,7 +259,10 @@ export default function ManageAssetsMap({
       </div>
 
       {/* Add Asset Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog
+        open={isDialogOpen && isAddingAsset}
+        onOpenChange={setIsDialogOpen}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Add New Asset</DialogTitle>

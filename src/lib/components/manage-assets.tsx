@@ -38,14 +38,16 @@ export default function ManageAssets() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [assetToDelete, setAssetToDelete] = useState<string | null>(null);
-  const [clickLocation, setClickLocation] = useState<ClickLocation | null>(null);
+  const [clickLocation, setClickLocation] = useState<ClickLocation | null>(
+    null
+  );
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     lng: "",
     lat: "",
   });
-  
+
   const lng = -104.6922;
   const lat = 40.3764;
   const zoom = 14;
@@ -65,26 +67,26 @@ export default function ManageAssets() {
 
   // Handle form input changes
   function handleInputChange(field: string, value: string) {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   }
 
   // Handle form submission
   function handleAddAsset() {
     if (!formData.name.trim()) return;
-    
+
     const newAsset: Asset = {
       id: `asset-${Date.now()}`,
       name: formData.name,
       description: formData.description,
       lng: parseFloat(formData.lng),
       lat: parseFloat(formData.lat),
-      color: '#3b82f6' // Blue color for assets
+      color: "#3b82f6", // Blue color for assets
     };
-    
-    setAssets(prev => [...prev, newAsset]);
+
+    setAssets((prev) => [...prev, newAsset]);
     setIsDialogOpen(false);
     setFormData({ name: "", description: "", lng: "", lat: "" });
     setClickLocation(null);
@@ -106,7 +108,7 @@ export default function ManageAssets() {
   // Confirm deletion
   function handleConfirmDelete() {
     if (assetToDelete) {
-      setAssets(prev => prev.filter(asset => asset.id !== assetToDelete));
+      setAssets((prev) => prev.filter((asset) => asset.id !== assetToDelete));
       setAssetToDelete(null);
     }
     setIsDeleteDialogOpen(false);
@@ -135,7 +137,7 @@ export default function ManageAssets() {
     });
 
     // Add click event to open dialog
-    map.current.on('click', handleMapClick);
+    map.current.on("click", handleMapClick);
 
     return () => {
       if (map.current) {
@@ -150,18 +152,18 @@ export default function ManageAssets() {
     if (!map.current) return;
 
     // Remove all existing marker instances
-    markerInstances.forEach(marker => marker.remove());
-    
+    markerInstances.forEach((marker) => marker.remove());
+
     // Create new marker instances
-    const newMarkerInstances = assets.map(asset => {
-      const popup = new Popup({ 
+    const newMarkerInstances = assets.map((asset) => {
+      const popup = new Popup({
         className: "custom-popup",
         closeButton: true,
-        closeOnClick: false
+        closeOnClick: false,
       }).setHTML(`
         <div style="color: black; padding: 12px; min-width: 200px;">
           <h3 style="margin: 0 0 8px 0; font-weight: bold; font-size: 16px;">${asset.name}</h3>
-          <p style="margin: 0 0 8px 0; font-size: 14px; color: #666;">${asset.description || 'No description'}</p>
+          <p style="margin: 0 0 8px 0; font-size: 14px; color: #666;">${asset.description || "No description"}</p>
           <p style="margin: 0 0 12px 0; font-size: 12px; color: #888;">
             ${asset.lat.toFixed(6)}, ${asset.lng.toFixed(6)}
           </p>
@@ -183,13 +185,13 @@ export default function ManageAssets() {
         .addTo(map.current!);
 
       // Update asset position when dragged
-      marker.on('dragend', () => {
+      marker.on("dragend", () => {
         const lngLat = marker.getLngLat();
-        setAssets(prev => prev.map(a => 
-          a.id === asset.id 
-            ? { ...a, lng: lngLat.lng, lat: lngLat.lat }
-            : a
-        ));
+        setAssets((prev) =>
+          prev.map((a) =>
+            a.id === asset.id ? { ...a, lng: lngLat.lng, lat: lngLat.lat } : a
+          )
+        );
       });
 
       return marker;
@@ -202,18 +204,18 @@ export default function ManageAssets() {
 
     // Cleanup function
     return () => {
-      newMarkerInstances.forEach(marker => marker.remove());
+      newMarkerInstances.forEach((marker) => marker.remove());
     };
   }, [assets]);
 
   return (
     <div className="h-screen bg-gray-50 flex flex-col">
-      
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-6 py-4">
         <h1 className="text-2xl font-bold text-gray-900">Manage Assets</h1>
         <p className="text-sm text-gray-600 mt-1">
-          Click anywhere on the map to add new assets. Drag markers to reposition them.
+          Click anywhere on the map to add new assets. Drag markers to
+          reposition them.
         </p>
       </div>
 
@@ -226,7 +228,7 @@ export default function ManageAssets() {
               Assets ({assets.length})
             </h2>
           </div>
-          
+
           <div className="flex-1 overflow-y-auto">
             {assets.length === 0 ? (
               <div className="p-4 text-center">
@@ -264,7 +266,10 @@ export default function ManageAssets() {
 
         {/* Map Container */}
         <div className="absolute w-full h-screen border border-red-500">
-          <div ref={mapContainer} className="relative border-2 border-red-500" />
+          <div
+            ref={mapContainer}
+            className="relative border-2 border-red-500"
+          />
         </div>
       </div>
 
@@ -274,7 +279,7 @@ export default function ManageAssets() {
           <DialogHeader>
             <DialogTitle>Add New Asset</DialogTitle>
           </DialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="name">Asset Name *</Label>
@@ -282,21 +287,23 @@ export default function ManageAssets() {
                 id="name"
                 placeholder="Enter asset name"
                 value={formData.name}
-                onChange={(e) => handleInputChange('name', e.target.value)}
+                onChange={(e) => handleInputChange("name", e.target.value)}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
                 placeholder="Enter asset description (optional)"
                 value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("description", e.target.value)
+                }
                 rows={3}
               />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="longitude">Longitude</Label>
@@ -306,10 +313,10 @@ export default function ManageAssets() {
                   step="any"
                   placeholder="Longitude"
                   value={formData.lng}
-                  onChange={(e) => handleInputChange('lng', e.target.value)}
+                  onChange={(e) => handleInputChange("lng", e.target.value)}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="latitude">Latitude</Label>
                 <Input
@@ -318,7 +325,7 @@ export default function ManageAssets() {
                   step="any"
                   placeholder="Latitude"
                   value={formData.lat}
-                  onChange={(e) => handleInputChange('lat', e.target.value)}
+                  onChange={(e) => handleInputChange("lat", e.target.value)}
                 />
               </div>
             </div>
@@ -328,10 +335,7 @@ export default function ManageAssets() {
             <Button variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button 
-              onClick={handleAddAsset}
-              disabled={!formData.name.trim()}
-            >
+            <Button onClick={handleAddAsset} disabled={!formData.name.trim()}>
               Add Asset
             </Button>
           </DialogFooter>
@@ -344,10 +348,11 @@ export default function ManageAssets() {
           <DialogHeader>
             <DialogTitle>Delete Asset</DialogTitle>
           </DialogHeader>
-          
+
           <div className="py-4">
             <p className="text-sm text-gray-600">
-              Are you sure you want to delete this asset? This action cannot be undone.
+              Are you sure you want to delete this asset? This action cannot be
+              undone.
             </p>
           </div>
 
@@ -355,10 +360,7 @@ export default function ManageAssets() {
             <Button variant="outline" onClick={handleCancelDelete}>
               Cancel
             </Button>
-            <Button 
-              variant="destructive"
-              onClick={handleConfirmDelete}
-            >
+            <Button variant="destructive" onClick={handleConfirmDelete}>
               Delete
             </Button>
           </DialogFooter>

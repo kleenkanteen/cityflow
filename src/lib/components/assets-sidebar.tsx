@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Trash2, MapPin } from "lucide-react";
+import { Trash2, MapPin, Plus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -24,11 +24,15 @@ interface Asset {
 interface AssetsSidebarProps {
   assets: Asset[];
   onAssetsChange: (assets: Asset[]) => void;
+  isAddingAsset: boolean;
+  onToggleAddingAsset: () => void;
 }
 
 export default function AssetsSidebar({
   assets,
   onAssetsChange,
+  isAddingAsset,
+  onToggleAddingAsset,
 }: AssetsSidebarProps) {
   const [deleteAssetDialog, setDeleteAssetDialog] = useState(false);
   const [assetToDelete, setAssetToDelete] = useState<string | null>(null);
@@ -46,23 +50,25 @@ export default function AssetsSidebar({
 
     try {
       const response = await fetch(`/api/assets/${assetToDelete}`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
 
       if (response.status === 200) {
         // Success - remove from local state and show success toast
-        const updatedAssets = assets.filter(asset => asset.id !== assetToDelete);
+        const updatedAssets = assets.filter(
+          (asset) => asset.id !== assetToDelete
+        );
         onAssetsChange(updatedAssets);
-        toast.success('Asset deleted successfully!');
+        toast.success("Asset deleted successfully!");
         setAssetToDelete(null);
         setDeleteAssetDialog(false);
       } else {
         // Error - show error toast
-        toast.error('Failed to delete asset. Try again later.');
+        toast.error("Failed to delete asset. Try again later.");
       }
     } catch (error) {
-      console.error('Error deleting asset:', error);
-      toast.error('Failed to delete asset. Try again later.');
+      console.error("Error deleting asset:", error);
+      toast.error("Failed to delete asset. Try again later.");
     } finally {
       setIsDeleting(false);
     }
@@ -75,6 +81,19 @@ export default function AssetsSidebar({
 
   return (
     <div className="bg-white border-r border-gray-200 flex flex-col h-full overflow-hidden">
+      {/* Add Asset Button */}
+      <div className="px-3 py-3 border-b border-gray-200">
+        <Button
+          onClick={onToggleAddingAsset}
+          variant={isAddingAsset ? "destructive" : "default"}
+          className="w-full"
+          size="sm"
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          {isAddingAsset ? "Cancel Adding" : "Add Asset"}
+        </Button>
+      </div>
+
       {/* Assets List */}
       <div className="flex-1 overflow-y-auto px-2 py-2">
         {assets.length === 0 ? (
@@ -130,23 +149,28 @@ export default function AssetsSidebar({
           <DialogHeader>
             <DialogTitle>Delete Asset</DialogTitle>
           </DialogHeader>
-          
+
           <div className="py-4">
             <p className="text-sm text-gray-600">
-              Are you sure you want to delete this asset? This action cannot be undone.
+              Are you sure you want to delete this asset? This action cannot be
+              undone.
             </p>
           </div>
 
           <DialogFooter className="flex gap-2">
-            <Button variant="outline" onClick={handleCancelDelete} disabled={isDeleting}>
+            <Button
+              variant="outline"
+              onClick={handleCancelDelete}
+              disabled={isDeleting}
+            >
               Cancel
             </Button>
-            <Button 
+            <Button
               variant="destructive"
               onClick={handleConfirmDelete}
               disabled={isDeleting}
             >
-              {isDeleting ? 'Deleting...' : 'Delete'}
+              {isDeleting ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>
         </DialogContent>
