@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { v4 as uuidv4 } from 'uuid';
 
 const STYLE = `https://api.maptiler.com/maps/outdoor-v2/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_API_KEY}`;
 
@@ -65,6 +67,7 @@ export default function ManageAssetsMap({
     lng: "",
     lat: "",
   });
+  const [isCreating, setIsCreating] = useState(false);
 
   // Handle map click to open dialog
   function handleMapClick(e: any) {
@@ -88,22 +91,47 @@ export default function ManageAssetsMap({
   }
 
   // Handle form submission
-  function handleAddAsset() {
+  async function handleAddAsset() {
     if (!formData.name.trim()) return;
     
-    const newAsset: Asset = {
-      id: `asset-${Date.now()}`,
-      name: formData.name,
-      description: formData.description,
-      lng: parseFloat(formData.lng),
-      lat: parseFloat(formData.lat),
-      color: '#3b82f6'
-    };
+    setIsCreating(true);
     
-    onAssetsChange([...assets, newAsset]);
-    setIsDialogOpen(false);
-    setFormData({ name: "", description: "", lng: "", lat: "" });
-    setClickLocation(null);
+    try {
+      const assetId = uuidv4();
+      const newAssetData = {
+        id: assetId,
+        name: formData.name,
+        description: formData.description,
+        lng: parseFloat(formData.lng),
+        lat: parseFloat(formData.lat),
+        color: '#3b82f6'
+      };
+
+      const response = await fetch('/api/assets/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newAssetData),
+      });
+
+      if (response.status === 200) {
+        // Success - add to local state and show success toast
+        onAssetsChange([...assets, newAssetData]);
+        toast.success('Asset created successfully!');
+        setIsDialogOpen(false);
+        setFormData({ name: "", description: "", lng: "", lat: "" });
+        setClickLocation(null);
+      } else {
+        // Error - show error toast
+        toast.error('Failed to create asset. Try again later.');
+      }
+    } catch (error) {
+      console.error('Error creating asset:', error);
+      toast.error('Failed to create asset. Try again later.');
+    } finally {
+      setIsCreating(false);
+    }
   }
 
   // Handle dialog cancel
@@ -225,6 +253,7 @@ export default function ManageAssetsMap({
                 placeholder="Enter asset name"
                 value={formData.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
+                disabled={isCreating}
               />
             </div>
             
@@ -236,6 +265,7 @@ export default function ManageAssetsMap({
                 value={formData.description}
                 onChange={(e) => handleInputChange('description', e.target.value)}
                 rows={3}
+                disabled={isCreating}
               />
             </div>
             
@@ -249,6 +279,7 @@ export default function ManageAssetsMap({
                   placeholder="Longitude"
                   value={formData.lng}
                   onChange={(e) => handleInputChange('lng', e.target.value)}
+                  disabled={isCreating}
                 />
               </div>
               
@@ -261,20 +292,21 @@ export default function ManageAssetsMap({
                   placeholder="Latitude"
                   value={formData.lat}
                   onChange={(e) => handleInputChange('lat', e.target.value)}
+                  disabled={isCreating}
                 />
               </div>
             </div>
           </div>
 
           <DialogFooter className="flex gap-2">
-            <Button variant="outline" onClick={handleCancel}>
+            <Button variant="outline" onClick={handleCancel} disabled={isCreating}>
               Cancel
             </Button>
             <Button 
               onClick={handleAddAsset}
-              disabled={!formData.name.trim()}
+              disabled={!formData.name.trim() || isCreating}
             >
-              Add Asset
+              {isCreating ? 'Creating...' : 'Add Asset'}
             </Button>
           </DialogFooter>
         </DialogContent>

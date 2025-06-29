@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 interface Asset {
   id: string;
@@ -31,19 +32,40 @@ export default function AssetsSidebar({
 }: AssetsSidebarProps) {
   const [deleteAssetDialog, setDeleteAssetDialog] = useState(false);
   const [assetToDelete, setAssetToDelete] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   function handleDeleteClick(assetId: string) {
     setDeleteAssetDialog(true);
     setAssetToDelete(assetId);
   }
 
-  function handleConfirmDelete() {
-    if (assetToDelete) {
-      const updatedAssets = assets.filter(asset => asset.id !== assetToDelete);
-      onAssetsChange(updatedAssets);
-      setAssetToDelete(null);
+  async function handleConfirmDelete() {
+    if (!assetToDelete) return;
+
+    setIsDeleting(true);
+
+    try {
+      const response = await fetch(`/api/assets/${assetToDelete}`, {
+        method: 'DELETE',
+      });
+
+      if (response.status === 200) {
+        // Success - remove from local state and show success toast
+        const updatedAssets = assets.filter(asset => asset.id !== assetToDelete);
+        onAssetsChange(updatedAssets);
+        toast.success('Asset deleted successfully!');
+        setAssetToDelete(null);
+        setDeleteAssetDialog(false);
+      } else {
+        // Error - show error toast
+        toast.error('Failed to delete asset. Try again later.');
+      }
+    } catch (error) {
+      console.error('Error deleting asset:', error);
+      toast.error('Failed to delete asset. Try again later.');
+    } finally {
+      setIsDeleting(false);
     }
-    setDeleteAssetDialog(false);
   }
 
   function handleCancelDelete() {
@@ -91,6 +113,7 @@ export default function AssetsSidebar({
                     variant="destructive"
                     size="sm"
                     className="h-8 w-8 p-0 ml-2 flex-shrink-0"
+                    disabled={isDeleting}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -115,14 +138,15 @@ export default function AssetsSidebar({
           </div>
 
           <DialogFooter className="flex gap-2">
-            <Button variant="outline" onClick={handleCancelDelete}>
+            <Button variant="outline" onClick={handleCancelDelete} disabled={isDeleting}>
               Cancel
             </Button>
             <Button 
               variant="destructive"
               onClick={handleConfirmDelete}
+              disabled={isDeleting}
             >
-              Delete
+              {isDeleting ? 'Deleting...' : 'Delete'}
             </Button>
           </DialogFooter>
         </DialogContent>
