@@ -7,8 +7,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { id, name, description, lng, lat, color } = body;
 
-    console.log(body);
-
     if (!id || !name || lng === undefined || lat === undefined || !color) {
       return NextResponse.json(
         { error: "Missing required fields." },

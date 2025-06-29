@@ -125,4 +125,10 @@ export const asset = pgTable("asset", {
   lng: decimal("lng").notNull(),
   lat: decimal("lat").notNull(),
   color: text("color").notNull(),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });

@@ -6,7 +6,10 @@ import { Map as MapLibreMap } from "maplibre-gl";
 import { Settings, MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 
-const ManageAssetsMap = dynamic(() => import('@/src/lib/components/manage-assets-map'), { ssr: false });
+const ManageAssetsMap = dynamic(
+  () => import("@/src/lib/components/manage-assets-map"),
+  { ssr: false }
+);
 
 interface Asset {
   id: string;
@@ -71,15 +74,12 @@ export default function ManagePage() {
       {/* Main Content */}
       <div className="flex w-full flex-1">
         <div className="w-1/4 h-full">
-          <AssetsSidebar
-            assets={assets}
-            onAssetsChange={handleAssetsChange}
-          />
+          <AssetsSidebar assets={assets} onAssetsChange={handleAssetsChange} />
         </div>
         <div className="w-3/4 h-full">
           <ManageAssetsMap
             onInit={(map) => setMap(map)}
-            onMove={(info) => setMapInfo(info)}
+            onMove={(info) => setMapInfo(info as any)}
             assets={assets}
             onAssetsChange={handleAssetsChange}
           />
