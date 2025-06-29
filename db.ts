@@ -4,7 +4,7 @@ import postgres from "postgres";
 
 config({ path: ".env" });
 
-const db = drizzle(
+const drizzleClient = drizzle(
   postgres(process.env.DATABASE_URL!, {
     prepare: false,
   }),
