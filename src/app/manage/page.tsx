@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AssetsSidebar from "@/src/lib/components/assets-sidebar";
 import { Map as MapLibreMap } from "maplibre-gl";
 import { Settings, MapPin } from "lucide-react";
@@ -29,6 +29,35 @@ export default function ManagePage() {
   const [mapInfo, setMapInfo] = useState<MapInfo | null>(null);
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const [assets, setAssets] = useState<Asset[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  async function fetchAssets() {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/assets/all');
+      if (!response.ok) {
+        throw new Error('Failed to fetch assets');
+      }
+      const data = await response.json();
+      
+      // Convert decimal strings to numbers for lng/lat
+      const processedAssets = data.map((asset: any) => ({
+        ...asset,
+        lng: parseFloat(asset.lng),
+        lat: parseFloat(asset.lat),
+      }));
+      
+      setAssets(processedAssets);
+    } catch (error) {
+      console.error('Error fetching assets:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchAssets();
+  }, []);
 
   function handleAssetsChange(newAssets: Asset[]) {
     setAssets(newAssets);
@@ -62,7 +91,7 @@ export default function ManagePage() {
             <div className="flex items-center space-x-3">
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">
-                  {assets.length}
+                  {isLoading ? '...' : assets.length}
                 </p>
                 <p className="text-xs text-gray-500">Total Assets</p>
               </div>
@@ -77,12 +106,22 @@ export default function ManagePage() {
           <AssetsSidebar assets={assets} onAssetsChange={handleAssetsChange} />
         </div>
         <div className="w-3/4 h-full">
-          <ManageAssetsMap
-            onInit={(map) => setMap(map)}
-            onMove={(info) => setMapInfo(info as any)}
-            assets={assets}
-            onAssetsChange={handleAssetsChange}
-          />
+          {!isLoading && (
+            <ManageAssetsMap
+              onInit={(map) => setMap(map)}
+              onMove={(info) => setMapInfo(info as any)}
+              assets={assets}
+              onAssetsChange={handleAssetsChange}
+            />
+          )}
+          {isLoading && (
+            <div className="flex items-center justify-center h-full bg-gray-100">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading assets...</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
