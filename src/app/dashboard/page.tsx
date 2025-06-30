@@ -3,7 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/src/lib/auth-client";
-import { Shield, Package, MessageSquare, MapPin, Users, Settings } from "lucide-react";
+import {
+  Shield,
+  Package,
+  MessageSquare,
+  MapPin,
+  Users,
+  Settings,
+} from "lucide-react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -28,6 +35,8 @@ export default function DashboardPage() {
         setIsLoading(false);
       }
     }
+
+    console.log("session", session);
   }, [session, isPending, router]);
 
   if (isLoading || isPending) {
@@ -156,7 +165,9 @@ export default function DashboardPage() {
                         <MessageSquare className="h-6 w-6 text-purple-600" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg">Submit Complaint</CardTitle>
+                        <CardTitle className="text-lg">
+                          Submit Complaint
+                        </CardTitle>
                         <CardDescription>
                           Report issues in your community
                         </CardDescription>
@@ -174,7 +185,9 @@ export default function DashboardPage() {
                         <Package className="h-6 w-6 text-green-600" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg">Request Equipment</CardTitle>
+                        <CardTitle className="text-lg">
+                          Request Equipment
+                        </CardTitle>
                         <CardDescription>
                           Request equipment for your projects
                         </CardDescription>
@@ -210,11 +223,15 @@ export default function DashboardPage() {
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">Your Role</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Your Role
+                  </h3>
                   <p className="text-gray-600">
                     You are logged in as{" "}
                     <span className="font-medium">
-                      {isAssetManagement ? "Asset Management Staff" : "Field Staff"}
+                      {isAssetManagement
+                        ? "Asset Management Staff"
+                        : "Field Staff"}
                     </span>
                   </p>
                 </div>

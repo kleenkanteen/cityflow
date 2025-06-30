@@ -84,12 +84,11 @@ export default function SignUpPage() {
       const { confirmPassword, ...apiData } = data;
       console.log("apiData", apiData);
       const result = await signUp.email({
-        name: "Sabih Sarowar",
-        email: "bobcharlie1@gmail.com",
-        password: "easyascake",
+        name: data.name,
+        email: data.email,
+        password: data.password,
         callbackURL: "/dashboard",
-        role: "asset_management",
-        image: "hello",
+        role: data.role,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
