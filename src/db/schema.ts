@@ -79,6 +79,7 @@ export const user = pgTable(
     email: text().notNull(),
     emailVerified: boolean("email_verified").notNull(),
     image: text(),
+    role: text("role").notNull().default("field_staff"), // field_staff or asset_management
     createdAt: timestamp("created_at", { mode: "string" }).notNull(),
     updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
   },
@@ -126,30 +127,10 @@ export const asset = pgTable("asset", {
   lat: decimal("lat").notNull(),
   color: text("color").notNull(),
   createdAt: timestamp("created_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .$defaultFn(() => new Date())
     .notNull(),
   updatedAt: timestamp("updated_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
-    .notNull(),
-});
-
-export const equipmentRequest = pgTable("equipment_request", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  requestorEmail: text("requestor_email").notNull(),
-  inventoryId: uuid("inventory_id")
-    .notNull()
-    .references(() => inventoryItem.id, { onDelete: "cascade" }),
-  inventoryItemName: text("inventory_item_name").notNull(),
-  quantity: integer("quantity").notNull(),
-  startDate: timestamp("start_date").notNull(),
-  endDate: timestamp("end_date").notNull(),
-  status: text("status").notNull().default("pending"), // pending, approved, denied
-  denialReason: text("denial_reason"),
-  createdAt: timestamp("created_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
-    .notNull(),
-  updatedAt: timestamp("updated_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .$defaultFn(() => new Date())
     .notNull(),
 });
 
@@ -163,10 +144,10 @@ export const complaint = pgTable("complaint", {
   status: text("status").notNull().default("pending"), // pending, in_progress, resolved
   reviewed: boolean("reviewed").notNull().default(false),
   createdAt: timestamp("created_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .$defaultFn(() => new Date())
     .notNull(),
   updatedAt: timestamp("updated_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
+    .$defaultFn(() => new Date())
     .notNull(),
   resolved: timestamp("resolved"),
 });
