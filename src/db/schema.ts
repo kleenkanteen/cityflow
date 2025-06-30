@@ -9,6 +9,7 @@ import {
   unique,
   numeric,
   boolean,
+  decimal,
 } from "drizzle-orm/pg-core";
 
 export const inventoryItem = pgTable("inventory_item", {
@@ -169,3 +170,121 @@ export const log = pgTable(
     }).onDelete("cascade"),
   ]
 );
+
+// New tables for parts ordering system
+export const supplier = pgTable("supplier", {
+  id: uuid().defaultRandom().primaryKey().notNull(),
+  name: text().notNull(),
+  contactName: text("contact_name"),
+  email: text(),
+  phone: text(),
+  address: text(),
+  website: text(),
+  notes: text(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+});
+
+export const part = pgTable("part", {
+  id: uuid().defaultRandom().primaryKey().notNull(),
+  partNumber: text("part_number").notNull(),
+  name: text().notNull(),
+  description: text(),
+  category: text().notNull(),
+  manufacturer: text(),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }),
+  minimumOrderQuantity: integer("minimum_order_quantity").default(1).notNull(),
+  leadTimeDays: integer("lead_time_days").default(7).notNull(),
+  supplierId: uuid("supplier_id").notNull(),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+}, (table) => [
+  foreignKey({
+    columns: [table.supplierId],
+    foreignColumns: [supplier.id],
+    name: "part_supplier_id_supplier_id_fk",
+  }).onDelete("cascade"),
+  unique("part_number_supplier_unique").on(table.partNumber, table.supplierId),
+]);
+
+export const batchOrder = pgTable("batch_order", {
+  id: uuid().defaultRandom().primaryKey().notNull(),
+  batchNumber: text("batch_number").notNull().unique(),
+  supplierId: uuid("supplier_id").notNull(),
+  status: text().default("draft").notNull(), // draft, pending, ordered, received, cancelled
+  totalAmount: decimal("total_amount", { precision: 12, scale: 2 }).default("0.00").notNull(),
+  orderDate: timestamp("order_date"),
+  expectedDeliveryDate: timestamp("expected_delivery_date"),
+  actualDeliveryDate: timestamp("actual_delivery_date"),
+  notes: text(),
+  orderedBy: uuid("ordered_by").notNull(),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+}, (table) => [
+  foreignKey({
+    columns: [table.supplierId],
+    foreignColumns: [supplier.id],
+    name: "batch_order_supplier_id_supplier_id_fk",
+  }).onDelete("cascade"),
+  foreignKey({
+    columns: [table.orderedBy],
+    foreignColumns: [user.id],
+    name: "batch_order_ordered_by_user_id_fk",
+  }).onDelete("cascade"),
+]);
+
+export const partOrder = pgTable("part_order", {
+  id: uuid().defaultRandom().primaryKey().notNull(),
+  batchOrderId: uuid("batch_order_id").notNull(),
+  partId: uuid("part_id").notNull(),
+  quantity: integer().notNull(),
+  unitPrice: decimal("unit_price", { precision: 10, scale: 2 }).notNull(),
+  totalPrice: decimal("total_price", { precision: 10, scale: 2 }).notNull(),
+  requestedBy: uuid("requested_by").notNull(),
+  requestReason: text("request_reason").notNull(),
+  urgencyLevel: text("urgency_level").default("normal").notNull(), // low, normal, high, critical
+  assetId: uuid("asset_id"), // Optional - if part is for specific asset
+  workOrderNumber: text("work_order_number"), // Optional - if part is for specific work order
+  receivedQuantity: integer("received_quantity").default(0).notNull(),
+  createdAt: timestamp("created_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+  updatedAt: timestamp("updated_at")
+    .$defaultFn(() => new Date())
+    .notNull(),
+}, (table) => [
+  foreignKey({
+    columns: [table.batchOrderId],
+    foreignColumns: [batchOrder.id],
+    name: "part_order_batch_order_id_batch_order_id_fk",
+  }).onDelete("cascade"),
+  foreignKey({
+    columns: [table.partId],
+    foreignColumns: [part.id],
+    name: "part_order_part_id_part_id_fk",
+  }).onDelete("cascade"),
+  foreignKey({
+    columns: [table.requestedBy],
+    foreignColumns: [user.id],
+    name: "part_order_requested_by_user_id_fk",
+  }).onDelete("cascade"),
+  foreignKey({
+    columns: [table.assetId],
+    foreignColumns: [asset.id],
+    name: "part_order_asset_id_asset_id_fk",
+  }).onDelete("set null"),
+]);
