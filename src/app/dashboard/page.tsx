@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "@/src/lib/auth-client";
+import { signOut, useSession } from "@/src/lib/auth-client";
 import {
   Shield,
   Package,
@@ -55,6 +55,16 @@ export default function DashboardPage() {
   const isAssetManagement = session.user.role === "asset_management";
   const isFieldStaff = session.user.role === "field_staff";
 
+  async function signOutUser() {
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/"); // redirect to login page
+        },
+      },
+    });
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -69,7 +79,7 @@ export default function DashboardPage() {
               <span className="text-sm text-gray-600">
                 Welcome, {session.user.name}
               </span>
-              <Button variant="outline" size="sm">
+              <Button variant="outline" onClick={signOutUser}>
                 Sign Out
               </Button>
             </div>
@@ -92,15 +102,19 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Actions Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div
+          className={`grid grid-cols-1 gap-6 md:grid-cols-2 ${
+            isAssetManagement ? "lg:grid-cols-3" : ""
+          }`}
+        >
           {/* Asset Management Staff Actions */}
           {isAssetManagement && (
             <>
               <Link href="/manage">
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <Card className="h-full cursor-pointer transition-shadow hover:shadow-lg">
                   <CardHeader>
                     <div className="flex items-center space-x-3">
-                      <div className="bg-blue-100 p-3 rounded-lg">
+                      <div className="rounded-lg bg-blue-100 p-3">
                         <MapPin className="h-6 w-6 text-blue-600" />
                       </div>
                       <div>
@@ -114,29 +128,11 @@ export default function DashboardPage() {
                 </Card>
               </Link>
 
-              <Link href="/inventory">
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                  <CardHeader>
-                    <div className="flex items-center space-x-3">
-                      <div className="bg-green-100 p-3 rounded-lg">
-                        <Package className="h-6 w-6 text-green-600" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg">Inventory</CardTitle>
-                        <CardDescription>
-                          Manage inventory and equipment requests
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                </Card>
-              </Link>
-
               <Link href="/complaints">
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                <Card className="h-full cursor-pointer transition-shadow hover:shadow-lg">
                   <CardHeader>
                     <div className="flex items-center space-x-3">
-                      <div className="bg-purple-100 p-3 rounded-lg">
+                      <div className="rounded-lg bg-purple-100 p-3">
                         <MessageSquare className="h-6 w-6 text-purple-600" />
                       </div>
                       <div>
@@ -149,45 +145,41 @@ export default function DashboardPage() {
                   </CardHeader>
                 </Card>
               </Link>
+
+            <Link href="/inventory">
+            <Card className="h-full cursor-pointer transition-shadow hover:shadow-lg">
+              <CardHeader>
+                <div className="flex items-center space-x-3">
+                  <div className="rounded-lg bg-green-100 p-3">
+                    <Package className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">Inventory</CardTitle>
+                    <CardDescription>
+                      Manage equipment requests
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+            </Link>
             </>
           )}
 
           {/* Field Staff Actions */}
           {isFieldStaff && (
             <>
-              <Link href="/submit-complaint">
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+              <Link href="/manage">
+                <Card className="h-full cursor-pointer transition-shadow hover:shadow-lg">
                   <CardHeader>
                     <div className="flex items-center space-x-3">
-                      <div className="bg-purple-100 p-3 rounded-lg">
-                        <MessageSquare className="h-6 w-6 text-purple-600" />
+                      <div className="rounded-lg bg-blue-100 p-3">
+                        <MapPin className="h-6 w-6 text-blue-600" />
                       </div>
                       <div>
-                        <CardTitle className="text-lg">
-                          Submit Complaint
-                        </CardTitle>
+                        <CardTitle className="text-lg">Manage Assets</CardTitle>
                         <CardDescription>
-                          Report issues in your community
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                </Card>
-              </Link>
-
-              <Link href="/request-equipment">
-                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                  <CardHeader>
-                    <div className="flex items-center space-x-3">
-                      <div className="bg-green-100 p-3 rounded-lg">
-                        <Package className="h-6 w-6 text-green-600" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg">
-                          Request Equipment
-                        </CardTitle>
-                        <CardDescription>
-                          Request equipment for your projects
+                          View and manage assets on the map
                         </CardDescription>
                       </div>
                     </div>
@@ -196,23 +188,6 @@ export default function DashboardPage() {
               </Link>
             </>
           )}
-
-          {/* Common Actions */}
-          <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-            <CardHeader>
-              <div className="flex items-center space-x-3">
-                <div className="bg-gray-100 p-3 rounded-lg">
-                  <Settings className="h-6 w-6 text-gray-600" />
-                </div>
-                <div>
-                  <CardTitle className="text-lg">Settings</CardTitle>
-                  <CardDescription>
-                    Manage your account settings
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-          </Card>
         </div>
 
         {/* Role Badge */}

@@ -4,9 +4,16 @@ import { equipmentRequest, inventoryItem } from '@/src/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import { CreateEquipmentRequestRequest } from '@/src/types/request';
 import { v4 as uuidv4 } from 'uuid';
+import { auth } from "@/src/lib/auth"
+import { headers } from "next/headers";
 
 export async function GET(request: NextRequest) {
   try {
+    const session = await auth.api.getSession({ headers: await headers() });
+    if (!session?.user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
 
@@ -43,6 +50,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body: CreateEquipmentRequestRequest = await request.json();
     
