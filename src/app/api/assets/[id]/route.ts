@@ -36,7 +36,7 @@ export async function PUT(
         color: color || "#3b82f6",
         updatedAt: new Date(),
       })
-      .where(eq(asset.id as any, id))
+      .where(eq(asset.id, id))
       .returning();
 
     if (updatedAsset.length === 0) {
@@ -72,7 +72,7 @@ export async function DELETE(
 
     const deletedAsset = await db
       .delete(asset)
-      .where(eq(asset.id as any, id))
+      .where(eq(asset.id, id))
       .returning();
 
     if (deletedAsset.length === 0) {

@@ -119,7 +119,7 @@ export const equipmentRequest = pgTable(
 );
 
 export const asset = pgTable("asset", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: uuid("id").primaryKey().defaultRandom().notNull(),
   name: text("name").notNull(),
   description: text("description"),
   lng: decimal("lng").notNull(),
