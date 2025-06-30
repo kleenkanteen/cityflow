@@ -4,7 +4,16 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Shield, Mail, Lock, User, ArrowLeft, Eye, EyeOff, Users } from "lucide-react";
+import {
+  Shield,
+  Mail,
+  Lock,
+  User,
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -35,18 +44,20 @@ import {
 import { signUp } from "@/src/lib/auth-client";
 import { toast } from "sonner";
 
-const formSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Please enter a valid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  confirmPassword: z.string(),
-  role: z.enum(["field_staff", "asset_management"], {
-    required_error: "Please select a role",
-  }),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-});
+const formSchema = z
+  .object({
+    name: z.string().min(2, "Name must be at least 2 characters"),
+    email: z.string().email("Please enter a valid email address"),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string(),
+    role: z.enum(["field_staff", "asset_management"], {
+      required_error: "Please select a role",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -74,13 +85,13 @@ export default function SignUpPage() {
       console.log("apiData", apiData);
       const result = await signUp.email({
         name: "Sabih Sarowar",
-        email: "bobcharlie@gmail.com",
+        email: "bobcharlie1@gmail.com",
         password: "easyascake",
         callbackURL: "/dashboard",
         role: "asset_management",
         image: "hello",
-        // createdAt: new Date().toISOString(),
-        // updatedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       });
 
       if (result.error) {
@@ -112,7 +123,11 @@ export default function SignUpPage() {
         {/* Header */}
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <Button variant="ghost" size="sm" className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-2"
+            >
               <ArrowLeft className="h-4 w-4" />
               Back to Home
             </Button>
@@ -122,7 +137,9 @@ export default function SignUpPage() {
               <Shield className="h-8 w-8 text-blue-600" />
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-gray-900">Create your account</h2>
+          <h2 className="text-3xl font-bold text-gray-900">
+            Create your account
+          </h2>
           <p className="mt-2 text-sm text-gray-600">
             Join CityFlow and start managing your assets
           </p>
@@ -155,10 +172,7 @@ export default function SignUpPage() {
                         Full Name
                       </FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter your full name"
-                          {...field}
-                        />
+                        <Input placeholder="Enter your full name" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -197,7 +211,10 @@ export default function SignUpPage() {
                         <Users className="h-4 w-4" />
                         Role
                       </FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select your role" />
@@ -214,7 +231,9 @@ export default function SignUpPage() {
                           </SelectItem>
                           <SelectItem value="asset_management">
                             <div className="flex flex-col items-start">
-                              <span className="font-medium">Asset Management Staff</span>
+                              <span className="font-medium">
+                                Asset Management Staff
+                              </span>
                               <span className="text-xs text-gray-500">
                                 Manage assets, inventory, and requests
                               </span>
