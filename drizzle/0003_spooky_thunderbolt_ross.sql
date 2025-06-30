@@ -1,0 +1,1 @@
+ALTER TABLE "complaint" ADD COLUMN "resolved" timestamp;

@@ -9,6 +9,7 @@ export interface Complaint {
   createdAt: Date;
   updatedAt: Date;
   reviewed: boolean;
+  resolved?: Date | string | null;
 }
 
 export interface CreateComplaintRequest {

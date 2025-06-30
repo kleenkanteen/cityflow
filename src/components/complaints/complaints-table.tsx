@@ -1,6 +1,6 @@
 "use client";
 
-import React from 'react';
+import { useState, useMemo } from 'react';
 import {
   Table,
   TableBody,
@@ -21,7 +21,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { CardDescription } from '@/components/ui/card';
-import { MoreHorizontal, Search, Check, ExternalLink } from 'lucide-react';
+import { MoreHorizontal, Search, Check, ExternalLink, X } from 'lucide-react';
 import { Complaint } from '@/src/types/complaint';
 
 interface ComplaintsTableProps {
@@ -30,9 +30,9 @@ interface ComplaintsTableProps {
 }
 
 export function ComplaintsTable({ complaints, onComplaintUpdated }: ComplaintsTableProps) {
-  const [searchTerm, setSearchTerm] = React.useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredComplaints = React.useMemo(() => {
+  const filteredComplaints = useMemo(() => {
     if (!searchTerm) return complaints;
     
     return complaints.filter(
@@ -64,6 +64,10 @@ export function ComplaintsTable({ complaints, onComplaintUpdated }: ComplaintsTa
     }
   }
 
+  async function handleMarkAsUnreviewed(id: string) {
+    await updateReviewed(id, false);
+  }
+
   async function handleUpdateStatus(id: string, status: string) {
     try {
       const response = await fetch(`/api/complaints/${id}`, {
@@ -81,6 +85,26 @@ export function ComplaintsTable({ complaints, onComplaintUpdated }: ComplaintsTa
       onComplaintUpdated();
     } catch (error) {
       console.error('Error updating complaint status:', error);
+    }
+  }
+
+  async function updateReviewed(id: string, reviewed: boolean) {
+    try {
+      const response = await fetch(`/api/complaints/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reviewed }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update complaint review status');
+      }
+
+      onComplaintUpdated();
+    } catch (error) {
+      console.error('Error updating complaint review status:', error);
     }
   }
 
@@ -111,7 +135,6 @@ export function ComplaintsTable({ complaints, onComplaintUpdated }: ComplaintsTa
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
         <div className="relative max-w-sm flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
             placeholder="Search complaints..."
             value={searchTerm}
@@ -128,6 +151,7 @@ export function ComplaintsTable({ complaints, onComplaintUpdated }: ComplaintsTa
             <TableRow>
               <TableHead>Date Submitted</TableHead>
               <TableHead>Name</TableHead>
+            <TableHead>Email</TableHead>
               <TableHead>Description</TableHead>
               <TableHead>Location</TableHead>
               <TableHead>Image</TableHead>
@@ -139,7 +163,7 @@ export function ComplaintsTable({ complaints, onComplaintUpdated }: ComplaintsTa
           <TableBody>
             {filteredComplaints.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8">
+                <TableCell colSpan={9} className="text-center py-8">
                   <CardDescription>
                     {searchTerm ? 'No complaints found matching your search.' : 'No complaints found.'}
                   </CardDescription>
@@ -150,6 +174,7 @@ export function ComplaintsTable({ complaints, onComplaintUpdated }: ComplaintsTa
                 <TableRow key={complaint.id}>
                   <TableCell className="font-medium">{formatDate(complaint.createdAt)}</TableCell>
                   <TableCell>{complaint.name || '-'}</TableCell>
+                  <TableCell>{complaint.email || '-'}</TableCell>
                   <TableCell className="max-w-[300px]">
                     <div className="truncate" title={complaint.description}>
                       {complaint.description}
@@ -190,7 +215,15 @@ export function ComplaintsTable({ complaints, onComplaintUpdated }: ComplaintsTa
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        {!complaint.reviewed && (
+                        {complaint.reviewed ? (
+                          <DropdownMenuItem
+                            onClick={() => handleMarkAsUnreviewed(complaint.id)}
+                            className="flex items-center gap-2 text-yellow-600"
+                          >
+                            <X className="h-4 w-4" />
+                            Mark as Not Reviewed
+                          </DropdownMenuItem>
+                        ) : (
                           <DropdownMenuItem
                             onClick={() => handleMarkAsReviewed(complaint.id)}
                             className="flex items-center gap-2 text-green-600"
@@ -199,25 +232,6 @@ export function ComplaintsTable({ complaints, onComplaintUpdated }: ComplaintsTa
                             Mark as Reviewed
                           </DropdownMenuItem>
                         )}
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => handleUpdateStatus(complaint.id, 'pending')}
-                          className="flex items-center gap-2"
-                        >
-                          Set to Pending
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleUpdateStatus(complaint.id, 'in_progress')}
-                          className="flex items-center gap-2"
-                        >
-                          Set to In Progress
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleUpdateStatus(complaint.id, 'resolved')}
-                          className="flex items-center gap-2"
-                        >
-                          Set to Resolved
-                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
