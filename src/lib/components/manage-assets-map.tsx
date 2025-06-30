@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useRef, useState } from "react";
-import maplibregl, { LngLat, LngLatBounds, Marker } from "maplibre-gl";
+import maplibregl, { LngLat, LngLatBounds, Marker, Popup } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import {
   Dialog,
@@ -209,12 +209,27 @@ export default function ManageAssetsMap({
 
     // Create new markers for all assets
     const newMarkers = assets.map((asset) => {
+      // Create popup for this marker
+      const popup = new Popup({
+        closeButton: false,
+        closeOnClick: false,
+        closeOnMove: false,
+        offset: [0, -20], // Offset popup above the marker
+        className: "asset-popup",
+      }).setHTML(
+        `<div style="font-size: 11px; font-weight: 500; color: #374151; padding: 2px 2px;">${asset.name}</div>`
+      );
+
       const marker = new Marker({
         color: asset.color,
         draggable: true,
       })
         .setLngLat([asset.lng, asset.lat])
+        .setPopup(popup) // Attach popup to marker
         .addTo(mapRef.current!);
+
+      // Show popup immediately and keep it open
+      marker.togglePopup();
 
       // Update asset position when dragged
       marker.on("dragend", () => {
@@ -223,6 +238,11 @@ export default function ManageAssetsMap({
           a.id === asset.id ? { ...a, lng: lngLat.lng, lat: lngLat.lat } : a
         );
         onAssetsChange(updatedAssets);
+
+        // Keep popup open after drag
+        if (!marker.getPopup().isOpen()) {
+          marker.togglePopup();
+        }
       });
 
       return marker;
@@ -254,6 +274,38 @@ export default function ManageAssetsMap({
 
   return (
     <>
+      <style jsx global>{`
+        .asset-popup .maplibregl-popup-content {
+          background: rgba(255, 255, 255, 0.4);
+          border: 1px solid rgba(229, 231, 235, 0.6);
+          border-radius: 6px;
+          box-shadow:
+            0 4px 6px -1px rgba(0, 0, 0, 0.1),
+            0 2px 4px -1px rgba(0, 0, 0, 0.06);
+          padding: 4px 8px;
+          font-family:
+            system-ui,
+            -apple-system,
+            sans-serif;
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
+        }
+
+        .asset-popup .maplibregl-popup-tip {
+          border-top-color: rgba(255, 255, 255, 0.4);
+          backdrop-filter: blur(4px);
+          -webkit-backdrop-filter: blur(4px);
+        }
+
+        .asset-popup .maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+          border-top-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .asset-popup .maplibregl-popup-anchor-top .maplibregl-popup-tip {
+          border-bottom-color: rgba(255, 255, 255, 0.4);
+        }
+      `}</style>
+
       <div ref={mapContainerRef} className="w-full h-full">
         {children}
       </div>
