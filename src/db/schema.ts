@@ -158,8 +158,8 @@ export const log = pgTable(
     title: text("title").notNull(),
     description: text("description").notNull(),
     jobType: text("job_type").notNull(),
-    dateStarted: timestamp("date_started", { mode: "string" }).notNull(),
-    dateFinished: timestamp("date_finished", { mode: "string" }),
+    startedAt: timestamp("date_started", { mode: "string" }).notNull(),
+    finishedAt: timestamp("date_finished", { mode: "string" }),
     jobStatus: text("job_status").notNull().default("in_progress"), // completed, in_progress, canceled
     assetId: uuid("asset_id").notNull(),
     createdAt: timestamp("created_at", { mode: "string" })
