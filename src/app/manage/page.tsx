@@ -20,6 +20,16 @@ interface Asset {
   color: string;
 }
 
+interface Log {
+  id: string;
+  title: string;
+  type: string;
+  description: string;
+  technician: string;
+  updatedAt: string;
+  assetId: string;
+}
+
 export interface MapInfo {
   zoom: number;
   center: [number, number];
@@ -29,6 +39,7 @@ export default function ManagePage() {
   const [mapInfo, setMapInfo] = useState<MapInfo | null>(null);
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const [assets, setAssets] = useState<Asset[]>([]);
+  const [logs, setLogs] = useState<Log[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAddingAsset, setIsAddingAsset] = useState(false);
 
@@ -56,12 +67,42 @@ export default function ManagePage() {
     }
   }
 
+  async function fetchLogs() {
+    try {
+      const response = await fetch("/api/logs");
+      if (!response.ok) {
+        throw new Error("Failed to fetch logs");
+      }
+      const data = await response.json();
+
+      // Format logs for display - mapping database structure to UI
+      const formattedLogs: Log[] = data.map((log: any) => ({
+        id: log.id,
+        title: log.title,
+        type: log.jobType,
+        description: log.description,
+        technician: log.technician,
+        updatedAt: log.updatedAt || log.createdAt,
+        assetId: log.assetId,
+      }));
+
+      setLogs(formattedLogs);
+    } catch (error) {
+      console.error("Error fetching logs:", error);
+    }
+  }
+
   useEffect(() => {
     fetchAssets();
+    fetchLogs();
   }, []);
 
   function handleAssetsChange(newAssets: Asset[]) {
     setAssets(newAssets);
+  }
+
+  function handleLogsChange(newLogs: Log[]) {
+    setLogs(newLogs);
   }
 
   function handleToggleAddingAsset() {
@@ -119,6 +160,8 @@ export default function ManagePage() {
           <AssetsSidebar
             assets={assets}
             onAssetsChange={handleAssetsChange}
+            logs={logs}
+            onLogsChange={handleLogsChange}
             isAddingAsset={isAddingAsset}
             onToggleAddingAsset={handleToggleAddingAsset}
           />

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Trash2, MapPin, Plus, Edit } from "lucide-react";
+import { Trash2, MapPin, Plus, Edit, Pencil } from "lucide-react";
 import * as Dialogs from "@radix-ui/react-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -40,13 +40,15 @@ interface Log {
   type: string;
   description: string;
   technician: string;
-  createdAt: string;
+  updatedAt: string;
   assetId: string;
 }
 
 interface AssetsSidebarProps {
   assets: Asset[];
   onAssetsChange: (assets: Asset[]) => void;
+  logs: Log[];
+  onLogsChange: (logs: Log[]) => void;
   isAddingAsset: boolean;
   onToggleAddingAsset: () => void;
 }
@@ -54,6 +56,8 @@ interface AssetsSidebarProps {
 export default function AssetsSidebar({
   assets,
   onAssetsChange,
+  logs,
+  onLogsChange,
   isAddingAsset,
   onToggleAddingAsset,
 }: AssetsSidebarProps) {
@@ -63,7 +67,7 @@ export default function AssetsSidebar({
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [logs, setLogs] = useState<Log[]>([]);
+
   const [newLog, setNewLog] = useState({
     title: "",
     type: "",
@@ -82,6 +86,18 @@ export default function AssetsSidebar({
   );
   // Sheet state for asset management
   const [isAssetSheetOpen, setIsAssetSheetOpen] = useState(false);
+  
+  // Log editing state
+  const [editingLogId, setEditingLogId] = useState<string | null>(null);
+  const [editingLogData, setEditingLogData] = useState({
+    title: "",
+    type: "",
+    description: "",
+    technician: "",
+  });
+  const [isSavingLog, setIsSavingLog] = useState(false);
+  const [isDeletingLog, setIsDeletingLog] = useState(false);
+  const [logToDelete, setLogToDelete] = useState<string | null>(null);
 
   // Filter assets based on search query (case-insensitive)
   const filteredAssets = assets.filter((asset) =>
@@ -109,40 +125,10 @@ export default function AssetsSidebar({
     });
     setIsAssetSheetOpen(true);
     setActiveTab("edit");
-    
-    // Fetch logs for this asset
-    await fetchLogsForAsset(asset.id);
     console.log("Sheet opened");
   }
 
-  async function fetchLogsForAsset(assetId: string) {
-    try {
-      const response = await fetch(`/api/logs?assetId=${assetId}`);
-      
-      if (response.ok) {
-        const fetchedLogs = await response.json();
-        
-        // Format logs for display - mapping existing log table structure to our UI
-        const formattedLogs: Log[] = fetchedLogs.map((log: any) => ({
-          id: log.id,
-          title: log.title,
-          type: log.jobType,
-          description: log.description,
-          technician: log.technician,
-          createdAt: new Date(log.createdAt).toLocaleDateString(),
-          assetId: log.assetId,
-        }));
-        
-        setLogs(formattedLogs);
-      } else {
-        console.error("Failed to fetch logs");
-        setLogs([]);
-      }
-    } catch (error) {
-      console.error("Error fetching logs:", error);
-      setLogs([]);
-    }
-  }
+
 
   function handleEditInputChange(field: string, value: string) {
     setEditFormData((prev) => ({
@@ -237,6 +223,113 @@ export default function AssetsSidebar({
     setDeleteAssetDialog(false);
   }
 
+  function handleEditLog(log: Log) {
+    setEditingLogId(log.id);
+    setEditingLogData({
+      title: log.title,
+      type: log.type,
+      description: log.description,
+      technician: log.technician,
+    });
+  }
+
+  function handleCancelEditLog() {
+    setEditingLogId(null);
+    setEditingLogData({
+      title: "",
+      type: "",
+      description: "",
+      technician: "",
+    });
+  }
+
+  async function handleSaveLog() {
+    if (!editingLogId || !editingLogData.title || !editingLogData.type || !editingLogData.description || !editingLogData.technician) {
+      return;
+    }
+
+    setIsSavingLog(true);
+
+    try {
+      const response = await fetch("/api/logs", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: editingLogId,
+          title: editingLogData.title,
+          type: editingLogData.type,
+          description: editingLogData.description,
+          technician: editingLogData.technician,
+        }),
+      });
+
+      if (response.ok) {
+        const { log: updatedLog } = await response.json();
+        
+        // Update the logs in parent state
+        const updatedLogs = logs.map((log) =>
+          log.id === editingLogId
+            ? {
+                ...log,
+                title: updatedLog.title,
+                type: updatedLog.jobType,
+                description: updatedLog.description,
+                technician: updatedLog.technician,
+                updatedAt: updatedLog.updatedAt,
+              }
+            : log
+        );
+        
+        onLogsChange(updatedLogs);
+        handleCancelEditLog();
+        toast.success("Log updated successfully!");
+      } else {
+        const error = await response.json();
+        toast.error("Failed to update log: " + (error.error || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Error updating log:", error);
+      toast.error("Failed to update log. Please try again.");
+    } finally {
+      setIsSavingLog(false);
+    }
+  }
+
+  async function handleDeleteLog(logId: string) {
+    setLogToDelete(logId);
+    setIsDeletingLog(true);
+
+    try {
+      const response = await fetch(`/api/logs?id=${logId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
+        // Remove the log from parent state
+        const updatedLogs = logs.filter((log) => log.id !== logId);
+        onLogsChange(updatedLogs);
+        
+        // Cancel edit mode if this log was being edited
+        if (editingLogId === logId) {
+          handleCancelEditLog();
+        }
+        
+        toast.success("Log deleted successfully!");
+      } else {
+        const error = await response.json();
+        toast.error("Failed to delete log: " + (error.error || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Error deleting log:", error);
+      toast.error("Failed to delete log. Please try again.");
+    } finally {
+      setIsDeletingLog(false);
+      setLogToDelete(null);
+    }
+  }
+
   async function handleAddLog() {
     if (
       !newLog.title ||
@@ -272,11 +365,13 @@ export default function AssetsSidebar({
           type: createdLog.jobType,
           description: createdLog.description,
           technician: createdLog.technician,
-          createdAt: createdLog.createdAt, 
+          updatedAt: createdLog.updatedAt || createdLog.createdAt,
           assetId: createdLog.assetId,
         };
 
-        setLogs([...logs, formattedLog]);
+        // Update both local state and parent logs
+        const updatedLogs = [...logs, formattedLog];
+        onLogsChange(updatedLogs);
         setNewLog({ title: "", type: "", description: "", technician: "" });
         toast.success("Log added successfully!");
       } else {
@@ -453,7 +548,7 @@ export default function AssetsSidebar({
               <TabsContent value="edit">
                 <div className="rounded-lg border p-6">
                   <h3 className="mb-4 font-medium text-lg">Edit Asset Details</h3>
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     <div>
                       <Label htmlFor="name" className="text-sm font-medium">
                         Name *
@@ -535,8 +630,8 @@ export default function AssetsSidebar({
               <TabsContent value="addLog">
                 <div className="rounded-lg border p-6">
                   <h3 className="mb-4 font-medium text-lg">Add New Log</h3>
-                  <div className="space-y-4">
-                    <div>
+                  <div className="space-y-2">
+                    <div className="flex flex-col space-y-2">
                       <Label htmlFor="log-title" className="text-sm font-medium">
                         Title *
                       </Label>
@@ -655,23 +750,139 @@ export default function AssetsSidebar({
                     ) : (
                       currentAssetLogs.map((log: Log) => (
                         <Card key={log.id} className="p-4">
-                          <div className="mb-2 flex items-start justify-between">
-                            <div className="flex items-center gap-2">
-                              <span className="rounded bg-primary/10 pr-2 py-1 text-sm font-semibold text-primary">
-                                {log.type.charAt(0).toUpperCase() + log.type.slice(1)}
-                              </span>
-                              <span className="text-sm text-muted-foreground">
-                                {new Date(log.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
-                              </span>
+                          {editingLogId === log.id ? (
+                            // Edit mode
+                            <div className="space-y-3">
+                              <div>
+                                <Label className="text-xs font-medium">Title</Label>
+                                <Input
+                                  value={editingLogData.title}
+                                  onChange={(e) =>
+                                    setEditingLogData((prev) => ({
+                                      ...prev,
+                                      title: e.target.value,
+                                    }))
+                                  }
+                                  className="mt-1"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs font-medium">Type</Label>
+                                <Select
+                                  value={editingLogData.type.substring(0, 1).toUpperCase() + editingLogData.type.substring(1)}
+                                  onValueChange={(value) =>
+                                    setEditingLogData((prev) => ({
+                                      ...prev,
+                                      type: value,
+                                    }))
+                                  }
+                                >
+                                  <SelectTrigger className="mt-1 h-8">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="maintenance">Maintenance</SelectItem>
+                                    <SelectItem value="repair">Repair</SelectItem>
+                                    <SelectItem value="installation">Installation</SelectItem>
+                                    <SelectItem value="upgrade">Upgrade</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                              <div>
+                                <Label className="text-xs font-medium">Technician/Supervisor</Label>
+                                <Input
+                                  value={editingLogData.technician}
+                                  onChange={(e) =>
+                                    setEditingLogData((prev) => ({
+                                      ...prev,
+                                      technician: e.target.value,
+                                    }))
+                                  }
+                                  className="mt-1"
+                                />
+                              </div>
+                              <div>
+                                <Label className="text-xs font-medium">Description</Label>
+                                <Textarea
+                                  value={editingLogData.description}
+                                  onChange={(e) =>
+                                    setEditingLogData((prev) => ({
+                                      ...prev,
+                                      description: e.target.value,
+                                    }))
+                                  }
+                                  className="mt-1"
+                                  rows={3}
+                                />
+                              </div>
+                              <div className="flex justify-end gap-2 pt-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={handleCancelEditLog}
+                                  disabled={isSavingLog}
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  onClick={handleSaveLog}
+                                  disabled={
+                                    isSavingLog ||
+                                    !editingLogData.title ||
+                                    !editingLogData.type ||
+                                    !editingLogData.description ||
+                                    !editingLogData.technician
+                                  }
+                                >
+                                  {isSavingLog ? "Saving..." : "Save"}
+                                </Button>
+                              </div>
                             </div>
-                            <span className="text-sm text-muted-foreground">
-                              by {log.technician}
-                            </span>
-                          </div>
-                          <h4 className="font-medium text-sm mb-2">{log.title}</h4>
-                          <p className="break-words text-sm leading-relaxed">
-                            {log.description}
-                          </p>
+                          ) : (
+                            // View mode
+                            <>
+                              <div className="mb-2 flex items-start justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className="rounded bg-primary/10 pr-2 py-1 text-sm font-semibold text-primary">
+                                    {log.type.charAt(0).toUpperCase() + log.type.slice(1)}
+                                  </span>
+                                  <span className="text-sm text-muted-foreground">
+                                    {new Date(log.updatedAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-muted-foreground">
+                                    by {log.technician}
+                                  </span>
+                                  <div className="flex gap-1 ml-2 flex-shrink-0">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="h-6 w-6 p-0"
+                                      onClick={() => handleEditLog(log)}
+                                      disabled={editingLogId !== null || isDeletingLog}
+                                    >
+                                      <Pencil className="h-3 w-3" color="#3b82f6" />
+                                    </Button>
+                                    <Button
+                                      variant="destructive"
+                                      size="sm"
+                                      className="h-6 w-6 p-0"
+                                      onClick={() => handleDeleteLog(log.id)}
+                                      disabled={editingLogId !== null || (isDeletingLog && logToDelete === log.id)}
+                                    >
+                                      <Trash2 className="h-3 w-3" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                              <h4 className="font-medium text-sm mb-2">{log.title}</h4>
+                              <p className="break-words text-sm leading-relaxed">
+                                {log.description}
+                              </p>
+                            </>
+                          )}
                         </Card>
                       ))
                     )}
