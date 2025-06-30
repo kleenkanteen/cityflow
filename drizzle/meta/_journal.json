@@ -15,6 +15,13 @@
       "when": 1751236727543,
       "tag": "0001_eminent_mister_fear",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751241626611,
+      "tag": "0002_unique_aaron_stack",
+      "breakpoints": true
     }
   ]
 }

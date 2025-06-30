@@ -108,6 +108,7 @@ export const complaint = pgTable("complaint", {
   location: text("location").notNull(),
   imageUrl: text("image_url"),
   status: text("status").notNull().default("pending"), // pending, in_progress, resolved
+  reviewed: boolean("reviewed").notNull().default(false),
   createdAt: timestamp("created_at")
     .$defaultFn(() => /* @__PURE__ */ new Date())
     .notNull(),

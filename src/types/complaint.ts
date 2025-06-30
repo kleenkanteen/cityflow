@@ -8,6 +8,7 @@ export interface Complaint {
   status: 'pending' | 'in_progress' | 'resolved';
   createdAt: Date;
   updatedAt: Date;
+  reviewed: boolean;
 }
 
 export interface CreateComplaintRequest {

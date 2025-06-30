@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/db';
 import { complaint } from '@/src/db/schema';
-import { desc } from 'drizzle-orm';
+import { desc, eq } from 'drizzle-orm';
 import { CreateComplaintRequest } from '@/src/types/complaint';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -41,7 +41,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const now = new Date();
     const newComplaint = await db
       .insert(complaint)
       .values({
@@ -52,8 +51,6 @@ export async function POST(request: NextRequest) {
         location,
         imageUrl: imageUrl || null,
         status: 'pending',
-        createdAt: now,
-        updatedAt: now,
       })
       .returning();
 

@@ -17,9 +17,10 @@ export async function uploadComplaintImage(file: File): Promise<{ url: string | 
   try {
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-    const filePath = `complaints/${fileName}`;
+    const filePath = `public/${fileName}`;
 
-    const { data, error } = await supabase.storage
+    const { data, error } = await supabase
+      .storage
       .from('complaint-images')
       .upload(filePath, file);
 
