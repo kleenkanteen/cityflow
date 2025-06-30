@@ -3,18 +3,20 @@
 import React, { useState, Fragment } from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2, MapPin, Plus, Edit } from "lucide-react";
-import {
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  DialogTitle,
-} from "@headlessui/react";
+import * as Dialogs from "@radix-ui/react-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
 
 interface Asset {
   id: string;
@@ -70,6 +72,8 @@ export default function AssetsSidebar({
   const [activeTab, setActiveTab] = useState<"edit" | "addLog" | "logs">(
     "edit"
   );
+  // Sheet state for logs
+  const [isLogsSheetOpen, setIsLogsSheetOpen] = useState(false);
 
   // Filter assets based on search query (case-insensitive)
   const filteredAssets = assets.filter((asset) =>
@@ -87,6 +91,7 @@ export default function AssetsSidebar({
   }
 
   function handleEditClick(asset: Asset) {
+    console.log("Edit button clicked, opening dialog for asset:", asset.name);
     setAssetToEdit(asset);
     setEditFormData({
       name: asset.name,
@@ -95,6 +100,7 @@ export default function AssetsSidebar({
       lat: asset.lat.toString(),
     });
     setEditAssetDialog(true);
+    console.log("Dialog state set to true");
   }
 
   function handleEditInputChange(field: string, value: string) {
@@ -214,7 +220,7 @@ export default function AssetsSidebar({
     setNewLog({ type: "", description: "", technician: "" });
     toast.success("Log added successfully!");
   }
-
+  
   return (
     <div className="bg-white border-r border-gray-200 flex flex-col h-full max-h-full space-y-3">
       {/* Add Asset Button - Fixed at top */}
@@ -312,29 +318,17 @@ export default function AssetsSidebar({
       </div>
 
       {/* Edit Asset Dialog */}
-      <Dialog
-        open={editAssetDialog}
-        onClose={() => setEditAssetDialog(false)}
-        className="relative z-50"
-      >
-        {/* The backdrop, rendered as a fixed sibling to the panel container */}
-        <DialogBackdrop className="fixed inset-0 bg-black/30" />
-
-        <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-          <DialogPanel
-            transition
-            className="w-full max-w-2xl transform rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all duration-300 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
-          >
-            <DialogTitle
-              as="h3"
-              className="text-lg font-medium leading-6 text-gray-900"
-            >
-              Asset Details
-            </DialogTitle>
-            <div className="mt-2">
-              <p className="text-sm text-gray-500">
+      <Dialogs.Root open={editAssetDialog} onOpenChange={setEditAssetDialog}>
+        <Dialogs.Portal>
+          <Dialogs.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+          <Dialogs.Content className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-2xl translate-x-[-50%] translate-y-[-50%] gap-4 border bg-white p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex flex-col space-y-1.5 text-center sm:text-left">
+              <Dialogs.Title className="text-lg font-semibold leading-none tracking-tight">
+                Asset Details
+              </Dialogs.Title>
+              <Dialogs.Description className="text-sm text-muted-foreground">
                 Manage and view details about this asset.
-              </p>
+              </Dialogs.Description>
             </div>
 
             <Tabs
@@ -485,7 +479,9 @@ export default function AssetsSidebar({
                   <Button
                     onClick={handleAddLog}
                     disabled={
-                      !newLog.type || !newLog.description || !newLog.technician
+                      !newLog.type ||
+                      !newLog.description ||
+                      !newLog.technician
                     }
                   >
                     Add Log
@@ -493,88 +489,58 @@ export default function AssetsSidebar({
                 </div>
               </TabsContent>
               <TabsContent value="logs">
-                <div className="my-4 h-72 space-y-3 overflow-y-auto rounded-md border p-1">
-                  {currentAssetLogs.length === 0 ? (
-                    <div className="py-8 text-center text-muted-foreground">
-                      No logs found for this asset.
-                    </div>
-                  ) : (
-                    currentAssetLogs.map((log) => (
-                      <Card key={log.id} className="p-4">
-                        <div className="mb-2 flex items-start justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="rounded bg-primary/10 px-2 py-1 text-sm font-semibold text-primary">
-                              {log.type}
-                            </span>
-                            <span className="text-sm text-muted-foreground">
-                              {log.date}
-                            </span>
-                          </div>
-                          <span className="text-sm text-muted-foreground">
-                            by {log.technician}
-                          </span>
-                        </div>
-                        <p className="break-words text-sm leading-relaxed">
-                          {log.description}
-                        </p>
-                      </Card>
-                    ))
-                  )}
-                </div>
-                <div className="flex flex-shrink-0 justify-end space-x-2">
+                <div className="py-8 text-center">
                   <Button
+                    onClick={() => setIsLogsSheetOpen(true)}
                     variant="outline"
-                    onClick={() => setActiveTab("addLog")}
+                    className="w-full"
                   >
-                    Add New Log
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setActiveTab("edit")}
-                  >
-                    Back
+                    See Logs ({currentAssetLogs.length})
                   </Button>
                 </div>
               </TabsContent>
             </Tabs>
-          </DialogPanel>
-        </div>
-      </Dialog>
+            <Dialogs.Close asChild>
+              <button
+                className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+                onClick={() => setEditAssetDialog(false)}
+              >
+                <span className="sr-only">Close</span>
+                ×
+              </button>
+            </Dialogs.Close>
+          </Dialogs.Content>
+        </Dialogs.Portal>
+      </Dialogs.Root>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog
+      <Dialogs.Root
         open={deleteAssetDialog}
-        onClose={() => setDeleteAssetDialog(false)}
-        className="relative z-50"
+        onOpenChange={setDeleteAssetDialog}
       >
-        {/* The backdrop, rendered as a fixed sibling to the panel container */}
-        <DialogBackdrop className="fixed inset-0 bg-black/30" />
-        <div className="fixed inset-0 flex w-screen items-center justify-center p-4">
-          <DialogPanel
-            transition
-            className="w-full max-w-md transform rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all duration-300 ease-out data-[closed]:scale-95 data-[closed]:opacity-0"
-          >
-            <DialogTitle
-              as="h3"
-              className="text-lg font-medium leading-6 text-gray-900"
-            >
-              Delete Asset
-            </DialogTitle>
-            <div className="mt-2">
-              <p className="text-sm text-gray-500">
-                Are you sure you want to delete this asset? This action cannot
-                be undone.
-              </p>
+        <Dialogs.Portal>
+          <Dialogs.Overlay className="fixed inset-0 bg-black/50 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+          <Dialogs.Content className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-white p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg">
+            <div className="flex flex-col space-y-1.5 text-center sm:text-left">
+              <Dialogs.Title className="text-lg font-semibold leading-none tracking-tight">
+                Delete Asset
+              </Dialogs.Title>
+              <Dialogs.Description className="text-sm text-muted-foreground">
+                Are you sure you want to delete this asset? This action cannot be
+                undone.
+              </Dialogs.Description>
             </div>
 
             <div className="mt-4 flex justify-end space-x-2">
-              <Button
-                variant="outline"
-                onClick={handleCancelDelete}
-                disabled={isDeleting}
-              >
-                Cancel
-              </Button>
+              <Dialogs.Close asChild>
+                <Button
+                  variant="outline"
+                  onClick={handleCancelDelete}
+                  disabled={isDeleting}
+                >
+                  Cancel
+                </Button>
+              </Dialogs.Close>
               <Button
                 variant="destructive"
                 onClick={handleConfirmDelete}
@@ -583,9 +549,126 @@ export default function AssetsSidebar({
                 {isDeleting ? "Deleting..." : "Delete"}
               </Button>
             </div>
-          </DialogPanel>
-        </div>
-      </Dialog>
+          </Dialogs.Content>
+        </Dialogs.Portal>
+      </Dialogs.Root>
+
+      {/* Logs Sheet */}
+      <Sheet open={isLogsSheetOpen} onOpenChange={setIsLogsSheetOpen}>
+        <SheetContent side="left" className="max-w-7xl h-screen">
+          <SheetHeader>
+            <SheetTitle>Asset Logs</SheetTitle>
+            <SheetDescription>
+              View and manage logs for {assetToEdit?.name || "this asset"}
+            </SheetDescription>
+          </SheetHeader>
+          
+            
+          <div className="mt-6 flex flex-col flex-1 space-y-4">
+            {/* Add Log Section */}
+            <div className="rounded-lg border p-4 mb-6">
+              <h3 className="mb-3 font-medium">Add New Log</h3>
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="sheet-log-type" className="text-sm">
+                    Log Type *
+                  </Label>
+                  <Input
+                    id="sheet-log-type"
+                    placeholder="Enter log type"
+                    value={newLog.type}
+                    onChange={(e) =>
+                      setNewLog((prev) => ({
+                        ...prev,
+                        type: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="sheet-log-description" className="text-sm">
+                    Description *
+                  </Label>
+                  <Textarea
+                    id="sheet-log-description"
+                    placeholder="Enter log description"
+                    rows={3}
+                    value={newLog.description}
+                    onChange={(e) =>
+                      setNewLog((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="sheet-log-technician" className="text-sm">
+                    Technician *
+                  </Label>
+                  <Input
+                    id="sheet-log-technician"
+                    placeholder="Enter technician name"
+                    value={newLog.technician}
+                    onChange={(e) =>
+                      setNewLog((prev) => ({
+                        ...prev,
+                        technician: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <Button
+                  onClick={handleAddLog}
+                  disabled={
+                    !newLog.type ||
+                    !newLog.description ||
+                    !newLog.technician
+                  }
+                  className="w-full"
+                >
+                  Add Log
+                </Button>
+              </div>
+            </div>
+
+            {/* Logs List */}
+            <div className="rounded-lg border p-4 ">
+              <h3 className="mb-3 font-medium">
+                Logs ({currentAssetLogs.length})
+              </h3>
+              <div className="max-h-[400px] space-y-3 overflow-y-auto">
+                {currentAssetLogs.length === 0 ? (
+                  <div className="py-8 text-center text-muted-foreground">
+                    No logs found for this asset.
+                  </div>
+                ) : (
+                  currentAssetLogs.map((log) => (
+                    <Card key={log.id} className="p-3">
+                      <div className="mb-2 flex items-start justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="rounded bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
+                            {log.type}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {log.date}
+                          </span>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          by {log.technician}
+                        </span>
+                      </div>
+                      <p className="break-words text-sm leading-relaxed">
+                        {log.description}
+                      </p>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
