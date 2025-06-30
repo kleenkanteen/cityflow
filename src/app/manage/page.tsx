@@ -1,0 +1,149 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import AssetsSidebar from "@/src/lib/components/assets-sidebar";
+import { Map as MapLibreMap } from "maplibre-gl";
+import { Settings, MapPin } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const ManageAssetsMap = dynamic(
+  () => import("@/src/lib/components/manage-assets-map"),
+  { ssr: false }
+);
+
+interface Asset {
+  id: string;
+  name: string;
+  description: string;
+  lng: number;
+  lat: number;
+  color: string;
+}
+
+export interface MapInfo {
+  zoom: number;
+  center: [number, number];
+}
+
+export default function ManagePage() {
+  const [mapInfo, setMapInfo] = useState<MapInfo | null>(null);
+  const [map, setMap] = useState<MapLibreMap | null>(null);
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAddingAsset, setIsAddingAsset] = useState(false);
+
+  async function fetchAssets() {
+    try {
+      setIsLoading(true);
+      const response = await fetch("/api/assets/all");
+      if (!response.ok) {
+        throw new Error("Failed to fetch assets");
+      }
+      const data = await response.json();
+
+      // Convert decimal strings to numbers for lng/lat
+      const processedAssets = data.map((asset: any) => ({
+        ...asset,
+        lng: parseFloat(asset.lng),
+        lat: parseFloat(asset.lat),
+      }));
+
+      setAssets(processedAssets);
+    } catch (error) {
+      console.error("Error fetching assets:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchAssets();
+  }, []);
+
+  function handleAssetsChange(newAssets: Asset[]) {
+    setAssets(newAssets);
+  }
+
+  function handleToggleAddingAsset() {
+    setIsAddingAsset(!isAddingAsset);
+  }
+
+  return (
+    <div className="flex flex-col w-full h-screen">
+      {/* Header - Fixed at top */}
+      <div className="bg-white border-b border-gray-100 shadow-sm flex-shrink-0">
+        <div className="px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="p-2.5 bg-blue-100 rounded-xl">
+                <Settings className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <div className="flex items-center space-x-3">
+                  <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                    Manage Assets
+                  </h1>
+                  {isAddingAsset && (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      Adding Mode
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center space-x-2 mt-1">
+                  <MapPin className="h-4 w-4 text-gray-500" />
+                  <p className="text-sm text-gray-600">
+                    {isAddingAsset
+                      ? "Click anywhere on the map to add a new asset"
+                      : "Click 'Add Asset' in the sidebar to start adding assets • Drag existing markers to move them"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Asset counter */}
+            <div className="flex items-center space-x-3">
+              <div className="text-right">
+                <p className="text-sm font-medium text-gray-900">
+                  {isLoading ? "..." : assets.length}
+                </p>
+                <p className="text-xs text-gray-500">Total Assets</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex w-full flex-1 h-4/5">
+        <div className="w-1/4 h-full">
+          <AssetsSidebar
+            assets={assets}
+            onAssetsChange={handleAssetsChange}
+            isAddingAsset={isAddingAsset}
+            onToggleAddingAsset={handleToggleAddingAsset}
+          />
+        </div>
+        <div className="w-3/4 h-full">
+          {!isLoading && (
+            <ManageAssetsMap
+              onInit={(map) => setMap(map)}
+              onMove={(info) => setMapInfo(info as any)}
+              assets={assets}
+              onAssetsChange={handleAssetsChange}
+              isAddingAsset={isAddingAsset}
+              onAssetAdded={() => setIsAddingAsset(false)}
+            />
+          )}
+          {isLoading && (
+            <div className="flex items-center justify-center h-full bg-gray-100">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading assets...</p>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

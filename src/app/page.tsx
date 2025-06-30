@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   MapPin,
   Wrench,
@@ -15,8 +15,8 @@ import {
   DollarSign,
   Clock,
   Phone,
-} from 'lucide-react';
-import Link from 'next/link';
+} from "lucide-react";
+import Link from "next/link";
 
 function App() {
   return (

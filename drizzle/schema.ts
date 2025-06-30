@@ -7,8 +7,8 @@ import {
   boolean,
   uuid,
   integer,
-  decimal,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const account = pgTable(
   "account",
@@ -117,56 +117,3 @@ export const equipmentRequest = pgTable(
     }).onDelete("cascade"),
   ]
 );
-
-export const asset = pgTable("asset", {
-  id: uuid("id").primaryKey().defaultRandom().notNull(),
-  name: text("name").notNull(),
-  description: text("description"),
-  lng: decimal("lng").notNull(),
-  lat: decimal("lat").notNull(),
-  color: text("color").notNull(),
-  createdAt: timestamp("created_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
-    .notNull(),
-  updatedAt: timestamp("updated_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
-    .notNull(),
-});
-
-export const equipmentRequest = pgTable("equipment_request", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  requestorEmail: text("requestor_email").notNull(),
-  inventoryId: uuid("inventory_id")
-    .notNull()
-    .references(() => inventoryItem.id, { onDelete: "cascade" }),
-  inventoryItemName: text("inventory_item_name").notNull(),
-  quantity: integer("quantity").notNull(),
-  startDate: timestamp("start_date").notNull(),
-  endDate: timestamp("end_date").notNull(),
-  status: text("status").notNull().default("pending"), // pending, approved, denied
-  denialReason: text("denial_reason"),
-  createdAt: timestamp("created_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
-    .notNull(),
-  updatedAt: timestamp("updated_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
-    .notNull(),
-});
-
-export const complaint = pgTable("complaint", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name"),
-  email: text("email"),
-  description: text("description").notNull(),
-  location: text("location").notNull(),
-  imageUrl: text("image_url"),
-  status: text("status").notNull().default("pending"), // pending, in_progress, resolved
-  reviewed: boolean("reviewed").notNull().default(false),
-  createdAt: timestamp("created_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
-    .notNull(),
-  updatedAt: timestamp("updated_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
-    .notNull(),
-  resolved: timestamp("resolved"),
-});
