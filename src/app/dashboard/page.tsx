@@ -146,23 +146,23 @@ export default function DashboardPage() {
                 </Card>
               </Link>
 
-              <Link href="/inventory">
-                <Card className="h-full cursor-pointer transition-shadow hover:shadow-lg">
-                  <CardHeader>
-                    <div className="flex items-center space-x-3">
-                      <div className="rounded-lg bg-green-100 p-3">
-                        <Package className="h-6 w-6 text-green-600" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-lg">Inventory</CardTitle>
-                        <CardDescription>
-                          Manage equipment requests
-                        </CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                </Card>
-              </Link>
+            <Link href="/inventory">
+            <Card className="h-full cursor-pointer transition-shadow hover:shadow-lg">
+              <CardHeader>
+                <div className="flex items-center space-x-3">
+                  <div className="rounded-lg bg-green-100 p-3">
+                    <Package className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">Inventory</CardTitle>
+                    <CardDescription>
+                      Manage equipment requests
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+            </Link>
             </>
           )}
 
