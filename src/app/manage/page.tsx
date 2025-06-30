@@ -3,7 +3,9 @@
 import React, { useState, useEffect } from "react";
 import AssetsSidebar from "@/src/lib/components/assets-sidebar";
 import { Map as MapLibreMap } from "maplibre-gl";
-import { Settings, MapPin } from "lucide-react";
+import { Settings, MapPin, Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 
 const ManageAssetsMap = dynamic(
@@ -36,6 +38,7 @@ export interface MapInfo {
 }
 
 export default function ManagePage() {
+  const router = useRouter();
   const [mapInfo, setMapInfo] = useState<MapInfo | null>(null);
   const [map, setMap] = useState<MapLibreMap | null>(null);
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -109,13 +112,21 @@ export default function ManagePage() {
     setIsAddingAsset(!isAddingAsset);
   }
 
+  function handleGoHome() {
+    router.push("/dashboard");
+  }
+
   return (
     <div className="flex flex-col w-full h-screen">
       {/* Header - Fixed at top */}
       <div className="bg-white border-b border-gray-100 shadow-sm flex-shrink-0">
         <div className="px-8 py-6">
           <div className="flex items-center justify-between">
+
             <div className="flex items-center space-x-4">
+            <div className="p-2.5 bg-blue-100 rounded-xl cursor-pointer hover:bg-blue-200" onClick={handleGoHome}>
+                <Home className="h-6 w-6 text-blue-600" />
+              </div>
               <div className="p-2.5 bg-blue-100 rounded-xl">
                 <Settings className="h-6 w-6 text-blue-600" />
               </div>
@@ -141,8 +152,8 @@ export default function ManagePage() {
               </div>
             </div>
 
-            {/* Asset counter */}
-            <div className="flex items-center space-x-3">
+            {/* Asset counter and Go Home button */}
+            <div className="flex items-center space-x-4">
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">
                   {isLoading ? "..." : assets.length}
