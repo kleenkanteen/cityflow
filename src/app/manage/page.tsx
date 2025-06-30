@@ -114,7 +114,7 @@ export default function ManagePage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex w-full flex-1">
+      <div className="flex w-full flex-1 h-4/5">
         <div className="w-1/4 h-full">
           <AssetsSidebar
             assets={assets}

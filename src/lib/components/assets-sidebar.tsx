@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Trash2, MapPin, Plus, Edit } from "lucide-react";
+import { Trash2, MapPin, Plus, Edit, Search, X } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -43,12 +43,18 @@ export default function AssetsSidebar({
   const [assetToEdit, setAssetToEdit] = useState<Asset | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [editFormData, setEditFormData] = useState({
     name: "",
     description: "",
     lng: "",
     lat: "",
   });
+
+  // Filter assets based on search query (case-insensitive)
+  const filteredAssets = assets.filter((asset) =>
+    asset.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   function handleDeleteClick(assetId: string) {
     setDeleteAssetDialog(true);
@@ -161,12 +167,12 @@ export default function AssetsSidebar({
   }
 
   return (
-    <div className="bg-white border-r border-gray-200 flex flex-col h-full overflow-hidden">
+    <div className="bg-white border-r border-gray-200 flex flex-col h-full max-h-full overflow-hidden space-y-3">
       {/* Add Asset Button - Fixed at top */}
-      <div className="px-3 py-3 border-b border-gray-200 flex-shrink-0">
+      <div className="px-3 py-3 flex-shrink-0 mb-3">
         <Button
           onClick={onToggleAddingAsset}
-          variant={isAddingAsset ? "destructive" : "default"}
+          variant={isAddingAsset ? "destructive" : "primary"}
           className="w-full"
           size="sm"
         >
@@ -175,18 +181,35 @@ export default function AssetsSidebar({
         </Button>
       </div>
 
+      {/* Search Bar */}
+      <div className="px-3 py-3flex-shrink-0">
+        <Input
+          placeholder="Search assets..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="pl-10 pr-10"
+        />
+        {searchQuery && (
+          <p className="text-xs text-gray-500 mt-2">
+            {filteredAssets.length} of {assets.length} assets found
+          </p>
+        )}
+      </div>
+
       {/* Assets List - Scrollable */}
-      <div className="flex-1 overflow-y-auto px-2 py-2">
-        {assets.length === 0 ? (
+      <div className="flex-1 overflow-y-auto px-2 py-2 min-h-0">
+        {filteredAssets.length === 0 ? (
           <div className="text-center py-12">
             <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 text-sm">
-              No assets yet. Click on the map to add your first asset.
+              {searchQuery
+                ? `No assets found matching "${searchQuery}"`
+                : "No assets yet. Click on the map to add your first asset."}
             </p>
           </div>
         ) : (
-          <div className="space-y-1 mt-2">
-            {assets.map((asset) => (
+          <div className="space-y-3 mt-2">
+            {filteredAssets.map((asset) => (
               <div
                 key={asset.id}
                 className="rounded-lg px-2 py-4 border border-gray-200 hover:border-gray-300"
@@ -220,7 +243,7 @@ export default function AssetsSidebar({
                       className="h-8 w-8 p-0"
                       disabled={isUpdating || isDeleting}
                     >
-                      <Edit className="h-4 w-4" />
+                      <Edit className="h-4 w-4" color="#3b82f6" />
                     </Button>
                     <Button
                       onClick={() => handleDeleteClick(asset.id)}
