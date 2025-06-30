@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import Image from "next/image";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,6 +20,20 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         {children}
+        <a
+          href="https://bolt.new"
+          className="fixed bottom-4 right-4 z-50"
+          target="_blank"
+        >
+          <Image
+            src="/bolt-badge.png"
+            alt="Bolt Badge"
+            width={70}
+            height={70}
+            className="opacity-80 hover:opacity-100 transition-opacity"
+            priority={false}
+          />
+        </a>
         <Toaster />
       </body>
     </html>
