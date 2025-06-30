@@ -50,6 +50,7 @@ export default function ManagePage() {
   const [isAddingAsset, setIsAddingAsset] = useState(false);
   const [activeTab, setActiveTab] = useState<TabType>('assets');
   const [complaintsLoading, setComplaintsLoading] = useState(false);
+  const [resolvingComplaintId, setResolvingComplaintId] = useState<string | null>(null);
 
   async function fetchAssets() {
     try {
@@ -84,9 +85,9 @@ export default function ManagePage() {
       }
       const data = await response.json();
       
-      // Filter for reviewed complaints and sort by createdAt (earliest first)
+      // Filter for reviewed, unresolved complaints and sort by createdAt
       const reviewedComplaints = data
-        .filter((complaint: Complaint) => complaint.reviewed === true)
+        .filter((complaint: Complaint) => complaint.reviewed === true && complaint.status !== 'resolved')
         .sort((a: Complaint, b: Complaint) => 
           new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
         );
@@ -96,6 +97,30 @@ export default function ManagePage() {
       console.error("Error fetching complaints:", error);
     } finally {
       setComplaintsLoading(false);
+    }
+  }
+
+  async function handleResolveComplaint(complaintId: string) {
+    if (resolvingComplaintId) return;
+    setResolvingComplaintId(complaintId);
+    try {
+      const response = await fetch(`/api/complaints/resolve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: complaintId }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to resolve complaint');
+      }
+
+      setComplaints(prevComplaints => prevComplaints.filter(c => c.id !== complaintId));
+    } catch (error) {
+      console.error("Error resolving complaint:", error);
+      // Here you might want to show an error to the user
+    } finally {
+      setResolvingComplaintId(null);
     }
   }
 
@@ -292,6 +317,24 @@ export default function ManagePage() {
                                 {complaint.email}
                               </div>
                             )}
+                          </div>
+                          <div className="flex items-center justify-end mt-3 pt-3 border-t border-gray-100">
+                            <div className="flex items-center">
+                              <input
+                                type="checkbox"
+                                id={`resolve-${complaint.id}`}
+                                className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 disabled:opacity-50"
+                                checked={resolvingComplaintId === complaint.id}
+                                onChange={() => handleResolveComplaint(complaint.id)}
+                                disabled={resolvingComplaintId !== null}
+                              />
+                              <label
+                                htmlFor={`resolve-${complaint.id}`}
+                                className={`ml-2 block text-sm ${resolvingComplaintId === complaint.id ? 'text-gray-500' : 'text-gray-700'}`}
+                              >
+                                {resolvingComplaintId === complaint.id ? 'Resolving...' : 'Mark as resolved'}
+                              </label>
+                            </div>
                           </div>
                         </div>
                       ))}
