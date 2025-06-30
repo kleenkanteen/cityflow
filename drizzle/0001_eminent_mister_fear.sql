@@ -1,4 +1,4 @@
-CREATE TABLE "complaint" (
+CREATE TABLE IF NOT EXISTS "complaint" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text,
 	"email" text,

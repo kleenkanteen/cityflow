@@ -78,10 +78,10 @@ export const user = pgTable(
     name: text().notNull(),
     email: text().notNull(),
     emailVerified: boolean("email_verified").notNull(),
-    image: text(),
+    image: text("image").notNull().default(""),
     role: text("role").notNull().default("field_staff"), // field_staff or asset_management
-    createdAt: timestamp("created_at", { mode: "string" }).notNull(),
-    updatedAt: timestamp("updated_at", { mode: "string" }).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [unique("user_email_unique").on(table.email)]
 );

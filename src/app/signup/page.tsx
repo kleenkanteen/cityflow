@@ -70,12 +70,8 @@ export default function SignUpPage() {
   async function handleSubmit(data: FormData) {
     setIsLoading(true);
     try {
-      const result = await signUp.email({
-        email: data.email,
-        password: data.password,
-        name: data.name,
-        role: data.role,
-      });
+      const { confirmPassword, ...apiData } = data;
+      const result = await signUp.email(apiData);
 
       if (result.error) {
         toast.error(result.error.message || "Sign up failed");
