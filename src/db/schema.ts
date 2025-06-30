@@ -133,26 +133,6 @@ export const asset = pgTable("asset", {
     .notNull(),
 });
 
-export const equipmentRequest = pgTable("equipment_request", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  requestorEmail: text("requestor_email").notNull(),
-  inventoryId: uuid("inventory_id")
-    .notNull()
-    .references(() => inventoryItem.id, { onDelete: "cascade" }),
-  inventoryItemName: text("inventory_item_name").notNull(),
-  quantity: integer("quantity").notNull(),
-  startDate: timestamp("start_date").notNull(),
-  endDate: timestamp("end_date").notNull(),
-  status: text("status").notNull().default("pending"), // pending, approved, denied
-  denialReason: text("denial_reason"),
-  createdAt: timestamp("created_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
-    .notNull(),
-  updatedAt: timestamp("updated_at")
-    .$defaultFn(() => /* @__PURE__ */ new Date())
-    .notNull(),
-});
-
 export const complaint = pgTable("complaint", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name"),
