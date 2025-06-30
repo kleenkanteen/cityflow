@@ -150,3 +150,30 @@ export const complaint = pgTable("complaint", {
     .notNull(),
   resolved: timestamp("resolved"),
 });
+
+export const log = pgTable(
+  "log",
+  {
+    id: uuid("id").primaryKey().defaultRandom().notNull(),
+    title: text("title").notNull(),
+    description: text("description").notNull(),
+    jobType: text("job_type").notNull(),
+    dateStarted: timestamp("date_started", { mode: "string" }).notNull(),
+    dateFinished: timestamp("date_finished", { mode: "string" }),
+    jobStatus: text("job_status").notNull().default("in_progress"), // completed, in_progress, canceled
+    assetId: uuid("asset_id").notNull(),
+    createdAt: timestamp("created_at", { mode: "string" })
+      .$defaultFn(() => /* @__PURE__ */ new Date())
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "string" })
+      .$defaultFn(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.assetId],
+      foreignColumns: [asset.id],
+      name: "log_asset_id_asset_id_fk",
+    }).onDelete("cascade"),
+  ]
+);
