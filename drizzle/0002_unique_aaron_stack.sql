@@ -1,1 +1,0 @@
-ALTER TABLE "complaint" ADD COLUMN "reviewed" boolean DEFAULT false NOT NULL;

@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import { pgTable, uuid, text, integer, timestamp, foreignKey, unique, numeric, boolean } from "drizzle-orm/pg-core"
 
 export const inventoryItem = pgTable("inventory_item", {
@@ -76,8 +77,8 @@ export const asset = pgTable("asset", {
 	lng: numeric().notNull(),
 	lat: numeric().notNull(),
 	color: text().notNull(),
-	createdAt: timestamp("created_at").notNull(),
-	updatedAt: timestamp("updated_at").notNull(),
+	createdAt: timestamp("created_at").notNull().default(sql`now()`),
+	updatedAt: timestamp("updated_at").notNull().default(sql`now()`),
 });
 
 export const verification = pgTable("verification", {
@@ -140,3 +141,4 @@ export const log = pgTable(
     }).onDelete("cascade"),
   ]
 );
+

@@ -4,11 +4,18 @@ import { equipmentRequest, inventoryItem } from '@/src/db/schema';
 import { eq } from 'drizzle-orm';
 import { UpdateRequestStatusRequest } from '@/src/types/request';
 import { sendRequestApprovalEmail, sendRequestDenialEmail } from '@/src/lib/resend';
+import { auth } from "@/src/lib/auth"
+import { headers } from "next/headers";
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body: Omit<UpdateRequestStatusRequest, 'id'> = await request.json();
     const { id } = params;

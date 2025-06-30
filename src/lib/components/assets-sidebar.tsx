@@ -385,9 +385,9 @@ export default function AssetsSidebar({
   }
 
   return (
-    <div className="bg-white border-r border-gray-200 flex flex-col h-full max-h-full space-y-3">
+    <div className="bg-white border-r border-gray-200 flex flex-col h-full max-h-full">
       {/* Add Asset Button - Fixed at top */}
-      <div className="px-3 py-3 flex-shrink-0 mb-3">
+      <div className="px-3 flex-shrink-0 ">
         <Button
           onClick={onToggleAddingAsset}
           variant={isAddingAsset ? "destructive" : "primary"}
@@ -400,7 +400,7 @@ export default function AssetsSidebar({
       </div>
 
       {/* Search Bar */}
-      <div className="px-3 py-3flex-shrink-0">
+      <div className="px-3 py-3 flex-shrink-0">
         <Input
           placeholder="Search assets..."
           value={searchQuery}
@@ -426,7 +426,7 @@ export default function AssetsSidebar({
             </p>
           </div>
         ) : (
-          <div className="space-y-3 mt-2">
+          <div className="space-y-3 mt-2 h-full">
             {filteredAssets.map((asset: Asset) => (
               <div
                 key={asset.id}

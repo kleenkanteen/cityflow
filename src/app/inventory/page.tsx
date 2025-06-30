@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { Package, RefreshCw, FileText } from 'lucide-react';
+import { Package, RefreshCw, FileText, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AddItemDialog } from '@/src/components/inventory/add-item-dialog';
@@ -48,6 +48,12 @@ export default function InventoryPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
+                <Link href="/dashboard">
+                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
+                    <ArrowLeft className="h-4 w-4" />
+                    Dashboard
+                  </Button>
+                </Link>
                 <div className="bg-blue-100 p-3 rounded-lg">
                   <Package className="h-8 w-8 text-blue-600" />
                 </div>

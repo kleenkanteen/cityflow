@@ -75,10 +75,10 @@ export default function ComplaintsPage() {
           <CardHeader>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <Link href="/">
+                <Link href="/dashboard">
                   <Button variant="ghost" size="sm" className="flex items-center gap-2">
                     <ArrowLeft className="h-4 w-4" />
-                    Back to Home
+                    Dashboard
                   </Button>
                 </Link>
                 <div className="bg-blue-100 p-3 rounded-lg">
