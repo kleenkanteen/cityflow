@@ -82,7 +82,6 @@ export default function SignUpPage() {
     setIsLoading(true);
     try {
       const { confirmPassword, ...apiData } = data;
-      console.log("apiData", apiData);
       const result = await signUp.email({
         name: data.name,
         email: data.email,

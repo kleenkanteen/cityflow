@@ -35,8 +35,6 @@ export default function DashboardPage() {
         setIsLoading(false);
       }
     }
-
-    console.log("session", session);
   }, [session, isPending, router]);
 
   if (isLoading || isPending) {
