@@ -1,9 +1,9 @@
 "use client";
 
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from "@/src/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -19,15 +19,27 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { InventoryItem, UpdateInventoryItemRequest } from '@/src/types/inventory';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  InventoryItem,
+  UpdateInventoryItemRequest,
+} from "@/src/types/inventory";
 
 const formSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
-  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
-  quantity: z.number().min(0, 'Quantity must be 0 or greater').int('Quantity must be a whole number'),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(100, "Name must be less than 100 characters"),
+  description: z
+    .string()
+    .max(500, "Description must be less than 500 characters")
+    .optional(),
+  quantity: z
+    .number()
+    .min(0, "Quantity must be 0 or greater")
+    .int("Quantity must be a whole number"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -39,14 +51,19 @@ interface EditItemDialogProps {
   onItemUpdated: () => void;
 }
 
-export function EditItemDialog({ item, open, onOpenChange, onItemUpdated }: EditItemDialogProps) {
+export function EditItemDialog({
+  item,
+  open,
+  onOpenChange,
+  onItemUpdated,
+}: EditItemDialogProps) {
   const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: item.name,
-      description: item.description || '',
+      description: item.description || "",
       quantity: item.quantity,
     },
   });
@@ -55,7 +72,7 @@ export function EditItemDialog({ item, open, onOpenChange, onItemUpdated }: Edit
     if (item) {
       form.reset({
         name: item.name,
-        description: item.description || '',
+        description: item.description || "",
         quantity: item.quantity,
       });
     }
@@ -64,27 +81,27 @@ export function EditItemDialog({ item, open, onOpenChange, onItemUpdated }: Edit
   async function handleSubmit(data: FormData) {
     setIsLoading(true);
     try {
-      const requestData: Omit<UpdateInventoryItemRequest, 'id'> = {
+      const requestData: Omit<UpdateInventoryItemRequest, "id"> = {
         name: data.name,
         description: data.description || undefined,
         quantity: data.quantity,
       };
 
       const response = await fetch(`/api/inventory/${item.id}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(requestData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update inventory item');
+        throw new Error("Failed to update inventory item");
       }
 
       onItemUpdated();
     } catch (error) {
-      console.error('Error updating inventory item:', error);
+      console.error("Error updating inventory item:", error);
     } finally {
       setIsLoading(false);
     }
@@ -100,7 +117,10 @@ export function EditItemDialog({ item, open, onOpenChange, onItemUpdated }: Edit
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="name"
@@ -121,7 +141,10 @@ export function EditItemDialog({ item, open, onOpenChange, onItemUpdated }: Edit
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter item description (optional)" {...field} />
+                    <Input
+                      placeholder="Enter item description (optional)"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -138,7 +161,9 @@ export function EditItemDialog({ item, open, onOpenChange, onItemUpdated }: Edit
                       type="number"
                       placeholder="0"
                       {...field}
-                      onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                      onChange={(e) =>
+                        field.onChange(parseInt(e.target.value, 10) || 0)
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -146,11 +171,15 @@ export function EditItemDialog({ item, open, onOpenChange, onItemUpdated }: Edit
               )}
             />
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? 'Updating...' : 'Update Item'}
+                {isLoading ? "Updating..." : "Update Item"}
               </Button>
             </DialogFooter>
           </form>

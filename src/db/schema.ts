@@ -162,10 +162,10 @@ export const log = pgTable(
     finishedAt: timestamp("date_finished", { mode: "string" }),
     jobStatus: text("job_status").notNull().default("in_progress"), // completed, in_progress, canceled
     assetId: uuid("asset_id").notNull(),
-    createdAt: timestamp("created_at", { mode: "string" })
+    createdAt: timestamp("created_at")
       .$defaultFn(() => /* @__PURE__ */ new Date())
       .notNull(),
-    updatedAt: timestamp("updated_at", { mode: "string" })
+    updatedAt: timestamp("updated_at")
       .$defaultFn(() => /* @__PURE__ */ new Date())
       .notNull(),
   },

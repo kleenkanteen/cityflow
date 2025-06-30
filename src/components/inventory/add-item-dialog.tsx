@@ -1,9 +1,9 @@
 "use client";
 
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   Dialog,
   DialogContent,
@@ -12,7 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/src/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -20,16 +20,25 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
-import { CreateInventoryItemRequest } from '@/src/types/inventory';
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { CreateInventoryItemRequest } from "@/src/types/inventory";
 
 const formSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100, 'Name must be less than 100 characters'),
-  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
-  quantity: z.number().min(0, 'Quantity must be 0 or greater').int('Quantity must be a whole number'),
+  name: z
+    .string()
+    .min(1, "Name is required")
+    .max(100, "Name must be less than 100 characters"),
+  description: z
+    .string()
+    .max(500, "Description must be less than 500 characters")
+    .optional(),
+  quantity: z
+    .number()
+    .min(0, "Quantity must be 0 or greater")
+    .int("Quantity must be a whole number"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -45,8 +54,8 @@ export function AddItemDialog({ onItemAdded }: AddItemDialogProps) {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: '',
-      description: '',
+      name: "",
+      description: "",
       quantity: 0,
     },
   });
@@ -60,23 +69,23 @@ export function AddItemDialog({ onItemAdded }: AddItemDialogProps) {
         quantity: data.quantity,
       };
 
-      const response = await fetch('/api/inventory', {
-        method: 'POST',
+      const response = await fetch("/api/inventory", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(requestData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create inventory item');
+        throw new Error("Failed to create inventory item");
       }
 
       form.reset();
       setOpen(false);
       onItemAdded();
     } catch (error) {
-      console.error('Error creating inventory item:', error);
+      console.error("Error creating inventory item:", error);
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +107,10 @@ export function AddItemDialog({ onItemAdded }: AddItemDialogProps) {
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="name"
@@ -119,7 +131,10 @@ export function AddItemDialog({ onItemAdded }: AddItemDialogProps) {
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter item description (optional)" {...field} />
+                    <Input
+                      placeholder="Enter item description (optional)"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -136,7 +151,9 @@ export function AddItemDialog({ onItemAdded }: AddItemDialogProps) {
                       type="number"
                       placeholder="0"
                       {...field}
-                      onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                      onChange={(e) =>
+                        field.onChange(parseInt(e.target.value, 10) || 0)
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -144,11 +161,15 @@ export function AddItemDialog({ onItemAdded }: AddItemDialogProps) {
               )}
             />
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? 'Adding...' : 'Add Item'}
+                {isLoading ? "Adding..." : "Add Item"}
               </Button>
             </DialogFooter>
           </form>
