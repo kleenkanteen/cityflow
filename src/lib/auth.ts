@@ -8,6 +8,11 @@ export const auth = betterAuth({
     provider: "pg",
     schema: schema,
   }),
+  advanced: {
+    database: {
+      generateId: false
+    }
+  },
   user: {
     additionalFields: {
       role: {

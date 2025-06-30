@@ -71,7 +71,17 @@ export default function SignUpPage() {
     setIsLoading(true);
     try {
       const { confirmPassword, ...apiData } = data;
-      const result = await signUp.email(apiData);
+      console.log("apiData", apiData);
+      const result = await signUp.email({
+        name: "Sabih Sarowar",
+        email: "bobcharlie@gmail.com",
+        password: "easyascake",
+        callbackURL: "/dashboard",
+        role: "asset_management",
+        image: "hello",
+        // createdAt: new Date().toISOString(),
+        // updatedAt: new Date().toISOString(),
+      });
 
       if (result.error) {
         toast.error(result.error.message || "Sign up failed");
