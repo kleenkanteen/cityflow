@@ -11,21 +11,29 @@ export async function PUT(
   try {
     const body: Omit<UpdateComplaintRequest, 'id'> = await request.json();
     const { id } = params;
-    const { status } = body;
+    const { status, reviewed } = body;
 
-    if (!status || !['pending', 'in_progress', 'resolved'].includes(status)) {
-      return NextResponse.json(
-        { error: 'Valid status is required' },
-        { status: 400 }
-      );
+    const updateData: any = {
+      updatedAt: new Date(),
+    };
+
+    if (status !== undefined) {
+      if (!['pending', 'in_progress', 'resolved'].includes(status)) {
+        return NextResponse.json(
+          { error: 'Valid status is required' },
+          { status: 400 }
+        );
+      }
+      updateData.status = status;
+    }
+
+    if (reviewed !== undefined) {
+      updateData.reviewed = reviewed;
     }
 
     const updatedComplaint = await db
       .update(complaint)
-      .set({
-        status,
-        updatedAt: new Date(),
-      })
+      .set(updateData)
       .where(eq(complaint.id, id))
       .returning();
 

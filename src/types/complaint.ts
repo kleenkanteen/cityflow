@@ -21,5 +21,6 @@ export interface CreateComplaintRequest {
 
 export interface UpdateComplaintRequest {
   id: string;
-  status: 'pending' | 'in_progress' | 'resolved';
+  status?: 'pending' | 'in_progress' | 'resolved';
+  reviewed?: boolean;
 }
