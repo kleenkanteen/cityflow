@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+See the full Devpost submission, video demo, and details here: https://devpost.com/software/cityflow-bqnfxr
 
-## Getting Started
+# Inspiration
+On the fateful day of June 12, 2025, Sabih talked with the Public Works Director of the City of Evans, Colorado. It is a small city with a population of just 20k, and his role was to oversee the roads, water lines, utility poles, etc.
 
-First, run the development server:
+In that call, Mr.Bereskie explained the various problems his department had with the current asset management software they used. When Sabih first asked him about their tech stack, the first words out of the director's mouth was "this is a sore point". He mentioned missing features that they had to creatively work around. He also gave an example of not knowing they ran out of inventory for an item that construction companies needed to get water from fire hydrants for construction sites.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun run dev
-```
+He also mentioned that the smaller companies in this space were getting bought out by larger ones, and then jacking up the prices.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+That's when he realized that this space needs some startup love - high quality solutions at an affordable price.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Tech Stack
+- AI coding: Bolt
+- Frontend & backend framework: Next.js + react
+- Database: Supabase
+- ORM: Drizzle
+- Auth: Better-auth
+- Styling: Tailwind + shadcn
+- And a little love from windsurf ;)
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+# Demo logins
+City staff: janedoe@gmail.com janedoe123
 
-## Learn More
+Field staff: johndoe@gmail.com johndoe123
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+# What's next?
+The graveyard of completed hackathon projects probably. This was interesting, but cities are a bit hard to sell to, and convince to switch to something like us.
